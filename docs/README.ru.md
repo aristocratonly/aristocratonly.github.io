@@ -1,10 +1,10 @@
 <div align="center">
 
-<img src="button-88x31.png" alt="status448" width="88" height="31">
+<img src="../assets/button-88x31.png" alt="status448" width="88" height="31">
 
 # status448
 
-**Русский** · [English](README.md)
+**Русский** · [English](../README.md)
 
 **Социальная сеть с населением в одного человека. Пока что.**
 
@@ -88,15 +88,19 @@ index.html  ──┬── оболочка (shell)  открытая напр�
 ```
 .
 ├── index.html              весь сайт: разметка, стили, скрипты
-├── photo.jpg               фото по умолчанию
-├── button-88x31.png        кнопка-баннер 88×31
-├── music.mp3               трек для плеера
 ├── .nojekyll               чтобы GitHub Pages отдавал файлы как есть
-├── supabase.sql            1. база: владелец, профиль, посты, статьи, хранилище фото
-├── supabase-guests.sql     2. гости: посты на стене, подписчики, лимиты
-├── supabase-users.sql      3. аккаунты, профили пользователей, подписки
-├── supabase-feed.sql       4. лента, комментарии, чат
-└── supabase-feed-fix.sql   5. в ленту попадают только посты, написанные в ленте
+├── assets/
+│   ├── photo.jpg           фото по умолчанию
+│   ├── button-88x31.png    кнопка-баннер 88×31
+│   └── music.mp3           трек для плеера
+├── supabase/               скрипты базы, запускаются по номерам
+│   ├── 01-base.sql         владелец, профиль, посты, статьи, хранилище фото
+│   ├── 02-guests.sql       гости: посты на стене, подписчики, лимиты
+│   ├── 03-users.sql        аккаунты, профили пользователей, подписки
+│   ├── 04-feed.sql         лента, комментарии, чат
+│   └── 05-feed-fix.sql     в ленту попадают только посты, написанные в ленте
+└── docs/
+    └── README.ru.md        README на русском
 ```
 
 ## ✦ Запуск своей копии
@@ -104,8 +108,8 @@ index.html  ──┬── оболочка (shell)  открытая напр�
 1. **Создайте проект** на [supabase.com](https://supabase.com).
 2. **Зарегистрируйте владельца**: Authentication → Users. Скопируйте его User UID.
 3. **Настройте базу.** В SQL Editor выполните скрипты строго по порядку:
-   `supabase.sql` → `supabase-guests.sql` → `supabase-users.sql` → `supabase-feed.sql` → `supabase-feed-fix.sql`.
-   Перед этим вставьте свой UID в первую строку `supabase.sql`. Все скрипты можно запускать повторно.
+   `supabase/01-base.sql` → `02-guests.sql` → `03-users.sql` → `04-feed.sql` → `05-feed-fix.sql`.
+   Перед этим вставьте свой UID в первую строку `01-base.sql`. Все скрипты можно запускать повторно.
 4. **Подключите сайт.** В `index.html`, в разделе `1. SUPABASE`, замените `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `OWNER_ID` и `NICK_DOMAIN` на свои значения.
 5. **Опубликуйте.** Отправьте файлы в репозиторий и включите GitHub Pages (Settings → Pages → ветка `main`, папка `/`).
 

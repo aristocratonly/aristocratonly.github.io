@@ -11,7 +11,7 @@
   if (window !== top || /[?&]noshell(=|&|$)/.test(location.search)) return;
   window.__shell448 = true;
   document.write('<style>html,body{margin:0;height:100%;overflow:hidden;background:#fff}#f448{position:fixed;inset:0;width:100%;height:100%;border:0;display:block}</style>' +
-    '<audio id="audio" src="music.mp3" preload="none"></audio><iframe id="f448" title="status448" allow="autoplay; clipboard-write"></iframe>' +
+    '<audio id="audio" src="assets/music.mp3" preload="none"></audio><iframe id="f448" title="status448" allow="autoplay; clipboard-write"></iframe>' +
     '<script>document.getElementById("f448").src = location.href;<\/script><plaintext hidden>');
 })();
 </script>
@@ -759,7 +759,7 @@ html.ip.show .site{opacity:1;transform:none;transition:opacity .9s ease,transfor
   </footer>
 </div>
 
-<audio id="audio" src="music.mp3" preload="none"></audio>
+<audio id="audio" src="assets/music.mp3" preload="none"></audio>
 <input type="file" id="file" accept="image/*" hidden>
 
 <dialog class="dlg reader" id="dlgArt">
@@ -853,7 +853,7 @@ html.ip.show .site{opacity:1;transform:none;transition:opacity .9s ease,transfor
 /* =====================================================================
    1. SUPABASE. Project Settings -> API (or "Connect"): the Project URL and
       the anon / publishable key. Both are public by design: what anyone may
-      do is decided by the Row Level Security rules in supabase.sql.
+      do is decided by the Row Level Security rules in supabase/01-base.sql.
       NEVER put the service_role / secret key here.
    ===================================================================== */
 const SUPABASE_URL = "https://ngltylrjsqaumuxyburv.supabase.co";
@@ -911,7 +911,7 @@ const DEFAULTS = {
 const SECRET_WORD = "sudo448";
 
 /* Shown whenever no photo has been uploaded in edit mode. */
-const DEFAULT_PHOTO = "photo.jpg";
+const DEFAULT_PHOTO = "assets/photo.jpg";
 
 const LIMITS = { name: 40, aka: 60, tagline: 60, track: 80, label: 30, value: 120, fields: 12, links: 6, linkLabel: 24, linkSub: 40, url: 300, post: 500, avatar: 200000 };
 
@@ -1098,7 +1098,7 @@ function renderProfile() {
   const pic = avatar || (onMain ? DEFAULT_PHOTO : "");    // people without a photo get the silhouette
   ph.classList.toggle("has-photo", !!pic);
   ph.style.backgroundImage = pic ? `url("${pic}")` : "";
-  ph.style.backgroundPosition = avatar || !pic ? "" : "61% 22%";   // the face sits right of center in photo.jpg
+  ph.style.backgroundPosition = avatar || !pic ? "" : "61% 22%";   // the face sits right of center in assets/photo.jpg
   ph.title = isOwner ? "Change photo" : "";
 
   /* misc */
@@ -1607,7 +1607,7 @@ function toggleFollow() {
 /* ---------- the 88x31 button: hidden, type "88x31" to find it ---------- */
 function copyBadge() {
   const base = location.origin + location.pathname.replace(/[^/]*$/, "");
-  const code = `<a href="${base}"><img src="${base}button-88x31.png" width="88" height="31" alt="status448"></a>`;
+  const code = `<a href="${base}"><img src="${base}assets/button-88x31.png" width="88" height="31" alt="status448"></a>`;
   (navigator.clipboard ? navigator.clipboard.writeText(code) : Promise.reject()).then(
     () => addLocal({ icon: "★", t: "Button code copied. Paste it on your site and {n} will link back. Probably." }),
     () => addLocal({ icon: "★", t: "Copy this onto your site: " + code.replace(/[*{}]/g, "") }));
@@ -1616,7 +1616,7 @@ function showBadge() {
   chatNote([el("span", {}, 
     "You found ", el("b", { textContent: profile.name }), "'s 88x31 button. Click it to copy the code for your site.",
     el("button", { type: "button", className: "badge", title: "Copy the code", onclick: copyBadge },
-      el("img", { src: "button-88x31.png", width: 88, height: 31, alt: "status448 88x31 button" })))]);
+      el("img", { src: "assets/button-88x31.png", width: 88, height: 31, alt: "status448 88x31 button" })))]);
 }
 
 /* ---------- poke + add friend (local fun) ---------- */
@@ -1720,7 +1720,7 @@ $("#play").addEventListener("click", () => {
 onAudio("play", () => { player.classList.add("playing"); setSwitch(true); });
 onAudio("pause", () => { player.classList.remove("playing"); setSwitch(false); });
 onAudio("timeupdate", () => { if (audio.duration) $("#prog").style.width = (audio.currentTime / audio.duration * 100) + "%"; });
-onAudio("error", () => { player.classList.remove("playing"); $("#play").disabled = true; $("#play").title = "music.mp3 was not found next to index.html"; });
+onAudio("error", () => { player.classList.remove("playing"); $("#play").disabled = true; $("#play").title = "assets/music.mp3 was not found"; });
 if (!audio.paused) { player.classList.add("playing"); setSwitch(true); }
 $("#pbar").addEventListener("click", e => {
   if (!audio.duration) return;

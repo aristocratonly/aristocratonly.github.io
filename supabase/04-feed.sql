@@ -1,6 +1,6 @@
 -- =====================================================================
 --  status448: the feed, comments and the chat room.
---  Run AFTER supabase.sql, supabase-guests.sql and supabase-users.sql.
+--  Run AFTER 01-base.sql, 02-guests.sql and 03-users.sql.
 --  Paste into SQL Editor, press Run. Safe to re-run.
 --
 --    feed       posts people write on their own wall + every article,

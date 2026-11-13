@@ -1,6 +1,6 @@
 -- =====================================================================
 --  status448: only posts written in the feed go to the feed.
---  Run AFTER supabase-feed.sql. Paste into SQL Editor, press Run.
+--  Run AFTER 04-feed.sql. Paste into SQL Editor, press Run.
 --  Safe to re-run.
 --
 --  Before: everything a person wrote on their own wall showed in the feed,

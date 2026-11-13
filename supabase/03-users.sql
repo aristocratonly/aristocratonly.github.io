@@ -1,6 +1,6 @@
 -- =====================================================================
---  status448: accounts for everyone. Run AFTER supabase.sql and
---  supabase-guests.sql. Paste into SQL Editor, press Run. Safe to re-run.
+--  status448: accounts for everyone. Run AFTER 01-base.sql and
+--  02-guests.sql. Paste into SQL Editor, press Run. Safe to re-run.
 --
 --  Who can do what:
 --    everyone            reads every profile, wall, article, follower list
@@ -125,7 +125,7 @@ create policy "insert: account"  on public.posts for insert to authenticated
               and exists (select 1 from public.users_profile u where u.id = auth.uid()));
 create policy "update: own post" on public.posts for update to authenticated
   using (user_id = auth.uid()) with check (user_id = auth.uid());
--- deleting stays with the owner ("delete: owner" from supabase.sql)
+-- deleting stays with the owner ("delete: owner" from 01-base.sql)
 
 -- only the owner deletes posts now: guests lose the delete button
 revoke execute on function public.guest_delete(text, uuid) from anon, authenticated;

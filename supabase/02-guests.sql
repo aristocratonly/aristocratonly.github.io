@@ -1,6 +1,6 @@
 -- =====================================================================
 --  status448: visitors' names, their posts on the wall, followers.
---  Run AFTER supabase.sql. Paste into SQL Editor, press Run.
+--  Run AFTER 01-base.sql. Paste into SQL Editor, press Run.
 --  Safe to run again.
 --
 --  Visitors never write to tables directly. They call the functions

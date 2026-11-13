@@ -1,10 +1,10 @@
 <div align="center">
 
-<img src="button-88x31.png" alt="status448" width="88" height="31">
+<img src="assets/button-88x31.png" alt="status448" width="88" height="31">
 
 # status448
 
-[Русский](README.ru.md) · **English**
+[Русский](docs/README.ru.md) · **English**
 
 **A social network with a population of one. For now.**
 
@@ -88,15 +88,19 @@ The database itself checks every permission: RLS policies, triggers and `securit
 ```
 .
 ├── index.html              the whole site: markup, styles, scripts
-├── photo.jpg               default photo
-├── button-88x31.png        88×31 banner button
-├── music.mp3               track for the player
 ├── .nojekyll               makes GitHub Pages serve files as they are
-├── supabase.sql            1. database: owner, profile, posts, articles, photo storage
-├── supabase-guests.sql     2. guests: wall posts, followers, limits
-├── supabase-users.sql      3. accounts, user profiles, follows
-├── supabase-feed.sql       4. feed, comments, chat
-└── supabase-feed-fix.sql   5. only posts written in the feed go to the feed
+├── assets/
+│   ├── photo.jpg           default photo
+│   ├── button-88x31.png    88×31 banner button
+│   └── music.mp3           track for the player
+├── supabase/               database scripts, run in numeric order
+│   ├── 01-base.sql         owner, profile, posts, articles, photo storage
+│   ├── 02-guests.sql       guests: wall posts, followers, limits
+│   ├── 03-users.sql        accounts, user profiles, follows
+│   ├── 04-feed.sql         feed, comments, chat
+│   └── 05-feed-fix.sql     only posts written in the feed go to the feed
+└── docs/
+    └── README.ru.md        README in Russian
 ```
 
 ## ✦ Running your own copy
@@ -104,8 +108,8 @@ The database itself checks every permission: RLS policies, triggers and `securit
 1. **Create a project** at [supabase.com](https://supabase.com).
 2. **Register the owner**: Authentication → Users. Copy their User UID.
 3. **Set up the database.** In the SQL Editor, run the scripts strictly in this order:
-   `supabase.sql` → `supabase-guests.sql` → `supabase-users.sql` → `supabase-feed.sql` → `supabase-feed-fix.sql`.
-   Before that, paste your UID into the first line of `supabase.sql`. Every script is safe to re-run.
+   `supabase/01-base.sql` → `02-guests.sql` → `03-users.sql` → `04-feed.sql` → `05-feed-fix.sql`.
+   Before that, paste your UID into the first line of `01-base.sql`. Every script is safe to re-run.
 4. **Connect the site.** In `index.html`, section `1. SUPABASE`, replace `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `OWNER_ID` and `NICK_DOMAIN` with your own values.
 5. **Publish.** Push the files to a repository and turn on GitHub Pages (Settings → Pages → branch `main`, folder `/`).
 
