@@ -333,6 +333,35 @@ dt .inl input{width:70px}
 @media (prefers-reduced-motion:reduce){.badge{transition:none}}
 
 /* ---------- wall tabs + articles ---------- */
+/* ---------- account links in the header ---------- */
+.acct{display:flex;align-items:baseline;gap:10px;font-size:11px;white-space:nowrap;margin-left:12px}
+.acct a,.acct button{font:inherit;color:#f0d2d4;background:none;border:0;padding:0;cursor:pointer;text-decoration:none}
+.acct a:hover,.acct button:hover{color:#fff;text-decoration:underline}
+.acct .me{color:#fff;font-weight:700}
+.top .tagline{margin-left:auto}
+/* ---------- admin strip on someone else's page ---------- */
+.adminbar{flex:none;display:flex;align-items:center;gap:10px;padding:5px 12px 5px 14px;font-size:11px;color:var(--muted);
+  background:#f8f0ee;border-bottom:1px solid var(--line);box-shadow:inset 3px 0 #a3242f}
+.adminbar p{flex:1;min-width:0}
+.adminbar b{color:#a3242f}
+.adminbar .btn{font-weight:400;color:#a3242f;background:#fff;border:1px solid var(--line);padding:3px 10px}
+.adminbar .btn:hover{background:#fbeaea;border-color:#c97f85}
+/* ---------- people ---------- */
+.people{flex:1;min-height:0;overflow-y:auto}
+.plist{list-style:none}
+.plist a{display:flex;align-items:center;gap:8px;padding:7px 8px;border-bottom:1px solid var(--tint);color:var(--ink);text-decoration:none}
+.plist a:hover{background:#fbf6f4;text-decoration:none}
+.plist .pa{flex:none;width:30px;height:30px;display:flex;align-items:center;justify-content:center;background:var(--tint);
+  border:1px solid var(--line);color:var(--crimson);font-weight:700;background-size:cover;background-position:center}
+.plist b{color:var(--link);display:block;line-height:1.25}
+.plist small{color:var(--muted);font-size:10px}
+.plist .owner .pa{background-color:var(--crimson);color:#fff;border-color:var(--crimson-deep)}
+.authswitch{font-size:11px;color:var(--muted)}
+.authswitch button{font:inherit;color:var(--link);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+.post a.who{color:var(--link)}
+.post a.who:hover{text-decoration:underline}
+.missing{padding:14px 10px;color:var(--muted)}
+
 .box > h2 .wtabs{display:flex;gap:10px;overflow:visible;color:#fff}
 .wtab{font:inherit;font-weight:700;color:#e3b5b9;background:none;border:0;padding:0;cursor:pointer}
 .wtab:hover{color:#fff}
@@ -396,7 +425,8 @@ dt .inl input{width:70px}
 @media (max-width:760px){
   body{align-items:stretch}
   .site{width:100%;height:100dvh;border:0}
-  .top{padding:calc(8px + env(safe-area-inset-top)) 10px 7px}
+  .top{padding:calc(8px + env(safe-area-inset-top)) 10px 7px;flex-wrap:wrap;row-gap:4px}
+  .acct{order:3;width:100%;margin-left:0;justify-content:flex-end}
   .logo{font-size:19px}
   .tagline{font-size:10px}
   .tagline em{font-size:11px}
@@ -493,7 +523,7 @@ html.ip.show .site{opacity:1;transform:none;transition:opacity .9s ease,transfor
 </div>
 <script>
 /* ?nointro: straight to the site (handy while editing the profile). */
-if (/[?&]nointro(=|&|$)/.test(location.search)) document.getElementById("intro").remove();
+if (/[?&](nointro(=|&|$)|u=)/.test(location.search)) document.getElementById("intro").remove();   // people's pages open straight away
 else document.documentElement.classList.add("ip");
 </script>
 
@@ -501,7 +531,13 @@ else document.documentElement.classList.add("ip");
   <header class="top">
     <div class="logo"><i>[</i>status448<i>]</i></div>
     <p class="tagline">HTTP 448: <em id="tagline"></em></p>
+    <nav class="acct" id="acct" aria-label="Account"></nav>
   </header>
+
+  <div class="adminbar" id="adminbar" hidden>
+    <p><b>Admin.</b> You can delete this profile together with its posts and articles.</p>
+    <button type="button" class="btn" id="btnDelUser">Delete profile</button>
+  </div>
 
   <div class="editbar" id="editbar" hidden>
     <p><b>Editing</b><span class="long">Click any underlined text to change it.</span></p>
@@ -560,7 +596,7 @@ else document.documentElement.classList.add("ip");
 
     <section class="a-wall" aria-label="Wall">
       <div class="box">
-        <h2><span class="wtabs" role="tablist"><button type="button" class="wtab" id="tabWall" role="tab" aria-selected="true">The Wall</button><button type="button" class="wtab" id="tabArts" role="tab" aria-selected="false">Articles<span id="acount"></span></button></span> <span id="online">live</span></h2>
+        <h2><span class="wtabs" role="tablist"><button type="button" class="wtab" id="tabWall" role="tab" aria-selected="true">The Wall</button><button type="button" class="wtab" id="tabArts" role="tab" aria-selected="false">Articles<span id="acount"></span></button><button type="button" class="wtab" id="tabPeople" role="tab" aria-selected="false">People</button></span> <span id="online">live</span></h2>
         <form class="composer" id="composer" autocomplete="off">
           <label for="status" id="who"></label>
           <input id="status" type="text" maxlength="90">
@@ -571,6 +607,7 @@ else document.documentElement.classList.add("ip");
           <div class="artbar" id="artbar" hidden><button type="button" class="btn" id="newArt">Write an article</button></div>
           <ul class="artlist" id="artlist"></ul>
         </div>
+        <div class="people" id="people" hidden><ul class="plist" id="plist"></ul></div>
       </div>
     </section>
 
@@ -624,15 +661,18 @@ else document.documentElement.classList.add("ip");
 </dialog>
 
 <dialog class="dlg" id="dlgLogin">
-  <h2>Member login</h2>
+  <h2 id="lhead">Log in</h2>
   <form id="loginForm">
-    <label>Email <input type="email" id="lemail" autocomplete="username" required></label>
-    <label>Password <input type="password" id="lpass" autocomplete="current-password" required></label>
+    <label>Nickname <input type="text" id="lemail" autocomplete="username" autocapitalize="off" spellcheck="false" maxlength="80" required></label>
+    <label>Password <input type="password" id="lpass" autocomplete="current-password" minlength="8" required></label>
+    <label id="lrepwrap" hidden>Repeat password <input type="password" id="lpass2" autocomplete="new-password"></label>
+    <p class="hint" id="lhint"></p>
     <p class="err" id="lerr" role="alert"></p>
     <div class="btns">
       <button type="submit" class="btn" id="lgo">Log in</button>
       <button type="button" class="btn plain" data-close>Cancel</button>
     </div>
+    <p class="authswitch" id="lswitch"></p>
   </form>
 </dialog>
 
@@ -678,6 +718,19 @@ else document.documentElement.classList.add("ip");
    ===================================================================== */
 const SUPABASE_URL = "https://ngltylrjsqaumuxyburv.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_Pd41xdLJHtC6Z8VV1GFMzw_AyvSi2gh";
+/* The owner's account id. The database checks it too; here it only decides which buttons show. */
+const OWNER_ID = "601e29a2-e3d6-4437-a6b5-b71663a8bdcd";
+/* People sign in with a nickname. Supabase wants an e-mail, so <nick>@NICK_DOMAIN is used;
+   no mail is ever sent there. */
+const NICK_DOMAIN = "users.aristocratonly.github.io";
+const NICK_RE = /^[a-z0-9_]{3,20}$/;
+const RESERVED = ["448", "admin", "owner", "status448", "root", "support", "moderator", "system", "null"];
+/* ?u=nick opens that person's page; without it, the owner's main page */
+const view = (() => {
+  const n = (new URLSearchParams(location.search).get("u") || "").toLowerCase();
+  return NICK_RE.test(n) ? { kind: "user", nick: n, id: null, missing: false } : { kind: "main", nick: "", id: null, missing: false };
+})();
+const onMain = view.kind === "main";
 
 /* =====================================================================
    2. DEFAULTS. Shown until you save your own profile in edit mode,
@@ -721,7 +774,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const el = (tag, props = {}, ...kids) => { const n = document.createElement(tag); Object.assign(n, props); n.append(...kids); return n; };
 const str = (v, max) => (typeof v === "string" ? v : "").slice(0, max);
-const AVATAR_PATH_RE = /^avatar-\d{10,16}\.jpg$/;
+const AVATAR_PATH_RE = /^(avatar-\d{10,16}\.jpg|u\/[0-9a-f-]{36}\/avatar-\d{10,16}\.jpg)$/;
 const avatarUrl = path => AVATAR_PATH_RE.test(path || "") && SUPABASE_URL ? `${SUPABASE_URL.replace(/\/+$/, "")}/storage/v1/object/public/avatars/${path}` : "";
 
 /* Only http(s) and mailto links are ever put into an href. */
@@ -757,17 +810,20 @@ function rich(tpl) {
 /* ---------- state ---------- */
 let profile = normalize(DEFAULTS);
 let avatar = "", avatarPath = "";   // avatar = public URL of the file in Storage
-let isOwner = false;
+let isOwner = false;            // may edit the profile on screen (the owner on the main page, a person on their own page)
+let isAdmin = false;           // the owner: deletes anything anywhere
+let me = null;                 // the signed-in account: { id, admin, nick, name }
 let sb = null;                 // the Supabase client once connected
 let inlineOpen = false, renderQueued = false;
 const site = $("#site");
 
-try {
+if (!onMain) profile = normalize({ name: view.nick, fields: [], links: [] });
+if (onMain) try {
   const c = JSON.parse(localStorage.getItem("s448v2") || "null");
   if (c && c.profile) profile = normalize(c.profile);
   if (c && typeof c.avatarPath === "string") { avatarPath = c.avatarPath; avatar = avatarUrl(avatarPath); }
 } catch {}
-function cache() { try { localStorage.setItem("s448v2", JSON.stringify({ profile, avatarPath })); } catch {} }
+function cache() { if (onMain) try { localStorage.setItem("s448v2", JSON.stringify({ profile, avatarPath })); } catch {} }
 
 /* =====================================================================
    PROFILE RENDERING
@@ -831,6 +887,8 @@ function renderProfile() {
   document.title = name + " | status448";
   site.classList.toggle("editing", isOwner);
   $("#editbar").hidden = !isOwner;
+  $("#adminbar").hidden = !(isAdmin && !onMain && view.id && !view.missing);
+  renderAcct();
 
   $("#tagline").replaceChildren(editable(el("span", { textContent: p.tagline }), p.tagline, { max: LIMITS.tagline, onSave: v => profile.tagline = v, placeholder: "add a tagline" }));
   $("#infohead").textContent = name + "'s profile";
@@ -883,19 +941,21 @@ function renderProfile() {
   /* actions under the photo */
   const act = $("#actions"); act.replaceChildren();
   act.append(el("li", {}, el("button", { type: "button", textContent: "Poke " + name, onclick: poke })));
-  if (!isOwner) act.append(el("li", {}, el("button", { type: "button", className: "followbtn" + (following ? " on" : ""),
+  if (!isOwner && !view.missing && !(isAdmin && onMain)) act.append(el("li", {}, el("button", { type: "button", className: "followbtn" + (following ? " on" : ""),
     textContent: following ? `Following ${name} ✓` : `Follow ${name}`, title: following ? "Click to unfollow" : "", onclick: toggleFollow })));
   showFollowers();
 
   /* photo */
   const ph = $("#photo");
-  ph.classList.add("has-photo");
-  ph.style.backgroundImage = `url("${avatar || DEFAULT_PHOTO}")`;
-  ph.style.backgroundPosition = avatar ? "" : "61% 22%";   // the face sits right of center in photo.jpg
+  const pic = avatar || (onMain ? DEFAULT_PHOTO : "");    // people without a photo get the silhouette
+  ph.classList.toggle("has-photo", !!pic);
+  ph.style.backgroundImage = pic ? `url("${pic}")` : "";
+  ph.style.backgroundPosition = avatar || !pic ? "" : "61% 22%";   // the face sits right of center in photo.jpg
   ph.title = isOwner ? "Change photo" : "";
 
   /* misc */
-  $("#conn").textContent = isOwner ? `You are ${name}. Hello, you.` : befriended ? `You are friends with ${name}.` : `You are a stranger to ${name}.`;
+  $("#conn").textContent = isOwner ? `You are ${name}. Hello, you.` : following ? `You follow ${name}.` : `You are a stranger to ${name}.`;
+  $("#composer").hidden = view.missing || $("#feed").hidden;
   $("#track").replaceChildren(editable(el("span", { textContent: p.track }), p.track, { max: LIMITS.track, onSave: v => profile.track = v, placeholder: "name this track" }));
   setComposer();
   refreshPosts();
@@ -917,12 +977,16 @@ function must(res) {
   return res.data;
 }
 
+/* the profile row this person may edit: the main one for the owner, their own for everyone else */
+const myProfileRow = changes => onMain
+  ? sb.from("profile").update(changes).eq("id", 1).select("id")
+  : sb.from("users_profile").update(changes).eq("id", me && me.id).select("id");
 function saveProfile() {
   cache();
   if (!sb || !isOwner) return;
   say("Saving…");
   lastSave = Date.now();
-  sb.from("profile").update(toRow(profile)).eq("id", 1).select("id").then(must)
+  myProfileRow(toRow(profile)).then(must)
     .then(() => say("Saved."), e => say(explain(e), true));
 }
 
@@ -1027,10 +1091,10 @@ $("#cropForm").addEventListener("submit", async e => {
   try {
     const blob = await cropToBlob();
     if (!blob || blob.type !== "image/jpeg" || blob.size > LIMITS.avatar) throw { message: "this picture won't shrink enough, try another one" };
-    const path = `avatar-${Date.now()}.jpg`, old = avatarPath;
+    const path = (onMain ? "" : `u/${me.id}/`) + `avatar-${Date.now()}.jpg`, old = avatarPath;
     const up = await sb.storage.from("avatars").upload(path, blob, { contentType: "image/jpeg", cacheControl: "31536000", upsert: false });
     if (up.error) throw up.error;
-    try { must(await sb.from("profile").update({ avatar_path: path }).eq("id", 1).select("id")); }
+    try { must(await myProfileRow({ avatar_path: path })); }
     catch (err) { await sb.storage.from("avatars").remove([path]); throw err; }
     if (old && old !== path) sb.storage.from("avatars").remove([old]);
     avatarPath = path; avatar = avatarUrl(path); cache(); renderProfile();
@@ -1042,7 +1106,7 @@ $("#cremove").addEventListener("click", async () => {
   if (!sb) return;
   try {
     const old = avatarPath;
-    must(await sb.from("profile").update({ avatar_path: null }).eq("id", 1).select("id"));
+    must(await myProfileRow({ avatar_path: null }));
     if (old) sb.storage.from("avatars").remove([old]);
     avatarPath = ""; avatar = ""; cache(); renderProfile();
     $("#dlgCrop").close(); say("Photo removed.");
@@ -1160,15 +1224,33 @@ function addPost({ kind, icon, me, fill, ts = Date.now(), sfx = "", quiet, id })
 const addFake = (o, extra = {}) => addPost({ kind: "fake", icon: o.icon, me: o.me, sfx: ", allegedly", fill: p => p.replaceChildren(...rich(o.t)), ...extra });
 const addLocal = (o, extra = {}) => addPost({ kind: "local", icon: o.icon, me: o.me, fill: p => p.replaceChildren(...rich(o.t)), ...extra });
 
-/* ---------- real posts ---------- */
-function fillReal(p, ctl, li) {
-  const d = li._data;
-  p.replaceChildren(el("b", { textContent: profile.name }), /^(is|was|has|just|isn't|can't|will|won't)\b/i.test(d.text) ? " " : "\n", d.text);
-  li.dataset.sfx = d.edited ? ", edited" : "";
+/* ---------- posts from the database ----------
+   Every row is one of: the wall's own person writing ("self"), a guest
+   (main wall only), or another account. Rights are worked out at render
+   time, because they change when someone logs in or out. */
+const SELF_VERBS = /^(is|was|has|just|isn't|can't|will|won't)\b/i;
+const isSelfPost = r => onMain ? !r.user_id && !r.author : r.user_id === view.id;
+function authorNode(r) {
+  if (r.author_key) return el("b", { textContent: r.author });                                  // guest
+  const href = r.author_nick ? "?u=" + encodeURIComponent(r.author_nick) : "./";
+  return el("a", { className: "who", href }, el("b", { textContent: r.author || "someone" }));
+}
+function fillDb(p, ctl, li) {
+  const r = li._data;
+  if (!r) return;
+  const text = str(r.text, LIMITS.post);
+  if (isSelfPost(r)) p.replaceChildren(el("b", { textContent: profile.name }), SELF_VERBS.test(text) ? " " : "\n", text);
+  else p.replaceChildren(authorNode(r), " wrote on ", el("b", { textContent: profile.name }), "'s wall:\n", text);
+  const mine = (me && r.user_id && r.user_id === me.id) || (!r.user_id && !!r.author_key && r.author_key === guest.key);
+  li.dataset.sfx = (mine && !isSelfPost(r) ? ", that's you" : "") + (r.edited_at ? ", edited" : "");
   ctl.replaceChildren();
-  if (isOwner) ctl.append(
-    el("button", { type: "button", textContent: "edit", onclick: () => editPost(li) }),
-    el("button", { type: "button", textContent: "delete", onclick: () => { if (confirm("Delete this post for everyone?")) sb.from("posts").delete().eq("id", li.dataset.id).select("id").then(must).then(() => say("Post deleted."), e => say(explain(e), true)); } }));
+  const canEdit = (onMain && isAdmin && isSelfPost(r)) || (me && r.user_id === me.id);
+  if (canEdit) ctl.append(el("button", { type: "button", textContent: "edit", onclick: () => editPost(li) }));
+  if (isAdmin) ctl.append(el("button", { type: "button", textContent: "delete", onclick: () => {
+    if (!confirm("Delete this post for everyone?")) return;
+    sb.from("posts").delete().eq("id", li.dataset.id).select("id").then(must)
+      .then(() => { removePost(li.dataset.id); if (isOwner) say("Post deleted."); }, e => addLocal({ icon: "!", t: explain(e) }));
+  } }));
   stamp(li);
 }
 function editPost(li) {
@@ -1182,59 +1264,46 @@ function editPost(li) {
     e.preventDefault();
     const text = ta.value.trim();
     if (!text) { ta.focus(); return; }
-    if (text !== old) sb.from("posts").update({ text }).eq("id", li.dataset.id).select("id").then(must).then(() => say("Post saved."), err => say(explain(err), true));
+    if (text !== old) sb.from("posts").update({ text }).eq("id", li.dataset.id).select("id").then(must)
+      .then(() => isOwner && say("Post saved."), err => addLocal({ icon: "!", t: explain(err) }));
     done();
   });
   ta.addEventListener("keydown", e => { if (e.key === "Escape") done(); if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); } });
   p.replaceWith(form); ta.focus();
 }
-/* a visitor's post: their name, their text; delete for the owner and for the author */
-function fillGuest(p, ctl, li) {
-  const d = li._data;
-  if (!d) return;
-  p.replaceChildren(el("b", { textContent: d.author }), " wrote on ", el("b", { textContent: profile.name }), "'s wall:\n", d.text);
-  li.dataset.sfx = d.mine ? ", that's you" : d.edited ? ", edited" : "";
-  ctl.replaceChildren();
-  if (isOwner || d.mine) ctl.append(el("button", { type: "button", textContent: "delete", onclick: () => {
-    if (!confirm("Delete this post for everyone?")) return;
-    const job = isOwner
-      ? sb.from("posts").delete().eq("id", li.dataset.id).select("id").then(must)
-      : sb.rpc("guest_delete", { token: guest.token, post_id: li.dataset.id }).then(r => { if (r.error) throw r.error; if (!r.data) throw { code: "denied" }; });
-    job.then(() => { removePost(li.dataset.id); if (isOwner) say("Post deleted."); },
-             e => isOwner ? say(explain(e), true) : addLocal({ icon: "!", t: "Couldn't delete: " + guestError(e) }));
-  } }));
-  stamp(li);
-}
+const onThisWall = r => onMain ? r.wall == null : r.wall === view.id;
 /* one row from the posts table -> on the wall (new or updated) */
 function upsertPost(row, quiet) {
-  const id = row.id, isGuest = !!row.author;
+  if (!onThisWall(row)) return;
+  const id = row.id;
   let li = realById.get(id);
-  const data = { text: str(row.text, LIMITS.post), edited: !!row.edited_at,
-    author: str(row.author, 24), mine: isGuest && !!guest.key && row.author_key === guest.key };
   const ts = Date.parse(row.created_at) || Date.now();
-  if (li) { li._data = data; li.dataset.ts = ts; li._fill(); }
-  else {
-    li = isGuest
-      ? addPost({ kind: "guest", icon: ([...data.author][0] || "?").toUpperCase(), id, ts, quiet, fill: fillGuest })
-      : addPost({ kind: "real", me: true, id, ts, quiet, fill: fillReal });
-    realById.set(id, li);
-    li._data = data; li._fill();
-  }
+  if (li) { li._data = row; li.dataset.ts = ts; li._fill(); return; }
+  const self = isSelfPost(row);
+  li = self
+    ? addPost({ kind: "real", me: true, id, ts, quiet, fill: fillDb })
+    : addPost({ kind: "guest", icon: ([...(row.author || "?")][0] || "?").toUpperCase(), id, ts, quiet, fill: fillDb });
+  realById.set(id, li);
+  li._data = row; li._fill();
 }
 function removePost(id) {
   const li = realById.get(id);
   if (li) { li.remove(); realById.delete(id); }
 }
-/* addPost calls fill before _data exists on the very first paint */
-const _fillReal = fillReal;
-fillReal = function (p, ctl, li) { if (li._data) _fillReal(p, ctl, li); };
 
 /* ---------- composer ---------- */
 const input = $("#status"), who = $("#who"), send = $("#send");
 let guestFocus = false;
+const isMember = () => !!(me && (me.admin || me.nick));
 function setComposer() {
-  if (isOwner) { who.textContent = profile.name; input.placeholder = "What's on your mind?"; input.maxLength = LIMITS.post; }
-  else {
+  who.title = "";
+  if (isMember()) {
+    who.textContent = isOwner ? profile.name : me.name;
+    input.placeholder = isOwner ? "What's on your mind?" : `write on ${profile.name}'s wall`;
+    input.maxLength = LIMITS.post;
+  } else if (!onMain) {
+    who.textContent = "You:"; input.placeholder = `log in to write on ${profile.name}'s wall`; input.maxLength = LIMITS.post;
+  } else {
     who.textContent = guestFocus ? (guest.name ? guest.name + ":" : "You:") : profile.name + " is";
     who.title = guestFocus ? (guest.name ? "Click to change your name" : "Click to set your name") : "";
     input.placeholder = `write on ${profile.name}'s wall`; input.maxLength = 280;
@@ -1245,7 +1314,7 @@ function cycler(list) {
   return () => { if (!bag.length) bag = list.slice().sort(() => Math.random() - .5); return bag.pop(); };
 }
 const nextEvent = cycler(EVENTS), nextStatus = cycler(STATUSES), nextPoke = cycler(POKES), nextReply = cycler(REPLIES);
-const hush = () => guestFocus || isOwner;
+const hush = () => guestFocus || isOwner || isMember();
 
 async function typeStatus(text) {
   if (calm) { input.value = text; await sleep(1200); }
@@ -1263,20 +1332,27 @@ async function typeStatus(text) {
   input.value = "";
   addFake({ me: true, t: "{n} is " + text.replace(/[*{}]/g, "") });
 }
-input.addEventListener("focus", () => { if (isOwner) return; guestFocus = true; input.value = ""; setComposer(); });
-input.addEventListener("blur", () => { if (isOwner || input.value.trim()) return; guestFocus = false; input.value = ""; setComposer(); });
+input.addEventListener("focus", () => {
+  if (isMember()) return;
+  if (!onMain) { input.blur(); openAuth("signup"); return; }      // other walls are for accounts only
+  guestFocus = true; input.value = ""; setComposer();
+});
+input.addEventListener("blur", () => { if (isMember() || input.value.trim()) return; guestFocus = false; input.value = ""; setComposer(); });
 $("#composer").addEventListener("submit", e => {
   e.preventDefault();
   const text = input.value.trim();
   if (!text) return;
   if (window.runEgg && runEgg(text)) { input.value = ""; return; }   // secret words typed into the wall
-  if (isOwner) {
+  if (isMember()) {
     if (!sb) return;
     input.value = "";
-    sb.from("posts").insert({ text: text.slice(0, LIMITS.post) }).select("id").then(must)
-      .then(() => say("Posted."), err => { say(explain(err), true); if (!input.value) input.value = text; });
+    const body = text.slice(0, LIMITS.post);
+    const row = onMain && me.admin ? { text: body } : { text: body, wall: onMain ? null : view.id, user_id: me.id };
+    sb.from("posts").insert(row).select("id").then(must)
+      .then(() => isOwner && say("Posted."), err => { addLocal({ icon: "!", t: "Not posted: " + guestError(err) }); if (!input.value) input.value = text; });
     return;
   }
+  if (!onMain) { openAuth("signup"); return; }
   if (!guestFocus) return;
   if (!sb) {                                     // no database: the old "only you can see this" note
     addPost({ kind: "local", icon: "✎", sfx: ", only you can see this", fill: p => p.replaceChildren(el("b", { textContent: "You" }), ` wrote on ${profile.name}'s wall: "${text}"`) });
@@ -1327,27 +1403,47 @@ $("#nameForm").addEventListener("submit", e => {
   if (go) go(); else input.focus();
 });
 $("#dlgName").addEventListener("close", () => { afterName = null; });
-who.addEventListener("click", e => { if (isOwner || !guestFocus) return; e.preventDefault(); askName(null); });
-who.addEventListener("mousedown", e => { if (!isOwner && guestFocus) e.preventDefault(); });   // keep the input focused
+who.addEventListener("click", e => { if (isMember() || !guestFocus) return; e.preventDefault(); askName(null); });
+who.addEventListener("mousedown", e => { if (!isMember() && guestFocus) e.preventDefault(); });   // keep the input focused
 
-/* ---------- followers ---------- */
+/* ---------- followers ----------
+   Accounts follow each other (the follows table). Guests can still follow
+   the owner's main page anonymously, as before; that count is added in. */
 let following = false, followerCount = null;
-try { following = localStorage.getItem("s448-following") === "1"; } catch {}
+const followTarget = () => onMain ? OWNER_ID : view.id;
 function showFollowers() {
   $("#followers").textContent = followerCount == null ? "" : `${followerCount} follower${followerCount === 1 ? "" : "s"}`;
 }
-function setFollowing(on) {
-  following = on;
-  try { on ? localStorage.setItem("s448-following", "1") : localStorage.removeItem("s448-following"); } catch {}
+async function loadFollow() {
+  const target = followTarget();
+  if (!sb || !target) return;
+  const [acc, anon] = await Promise.all([
+    sb.from("follows").select("follower", { count: "exact", head: true }).eq("followee", target),
+    onMain ? sb.from("site_stats").select("followers").eq("id", 1).maybeSingle() : Promise.resolve({ data: null })
+  ]);
+  followerCount = (acc.count || 0) + ((anon.data && anon.data.followers) || 0);
+  if (me && me.id) {
+    const mine = await sb.from("follows").select("follower", { count: "exact", head: true }).eq("followee", target).eq("follower", me.id);
+    following = !!mine.count;
+  } else if (onMain) {
+    const r = await sb.rpc("is_following", { token: guest.token });
+    following = !r.error && r.data === true;
+  } else following = false;
   renderProfile();
 }
+let followTimer = 0;
+const reloadFollow = () => { clearTimeout(followTimer); followTimer = setTimeout(loadFollow, 200); };
 function toggleFollow() {
   if (!sb) { addLocal({ icon: "+", t: "Following works once the database is connected." }); return; }
-  const on = !following;
-  sb.rpc(on ? "follow" : "unfollow", { token: guest.token }).then(({ data, error }) => {
+  const on = !following, target = followTarget();
+  let job;
+  if (me && me.id) job = on ? sb.from("follows").insert({ follower: me.id, followee: target })
+                            : sb.from("follows").delete().eq("follower", me.id).eq("followee", target);
+  else if (onMain) job = sb.rpc(on ? "follow" : "unfollow", { token: guest.token });
+  else { openAuth("signup"); return; }
+  job.then(({ error }) => {
     if (error) { addLocal({ icon: "!", t: guestError(error) }); return; }
-    if (typeof data === "number") followerCount = data;
-    setFollowing(on);
+    following = on; renderProfile(); reloadFollow();
     addLocal(on ? { icon: "★", t: "You followed {n}. Bold move for 2004." } : { icon: "×", t: "You unfollowed {n}. {n} will survive. Probably." });
   }, () => addLocal({ icon: "!", t: "No connection. Try again." }));
 }
@@ -1494,13 +1590,35 @@ function renderArts() {
     ul.append(el("li", {}, el("button", { type: "button", onclick: () => openArt(a.id) },
       el("b", { textContent: a.title }), el("small", { textContent: fmtDate(a.createdAt) + (a.edited ? ", edited" : "") }), el("p", { textContent: excerpt(a.body) }))));
 }
-function showTab(arts) {
-  $("#tabWall").setAttribute("aria-selected", !arts); $("#tabArts").setAttribute("aria-selected", arts);
-  $("#composer").hidden = arts; $("#feed").hidden = arts; $("#arts").hidden = !arts;
-  if (!arts) trim();
+/* the three tabs of the wall box: "wall", "arts", "people" (true/false still mean arts/wall) */
+function showTab(which) {
+  const t = which === true ? "arts" : which === false ? "wall" : which;
+  $("#tabWall").setAttribute("aria-selected", t === "wall"); $("#tabArts").setAttribute("aria-selected", t === "arts");
+  $("#tabPeople").setAttribute("aria-selected", t === "people");
+  $("#feed").hidden = t !== "wall"; $("#composer").hidden = t !== "wall" || view.missing;
+  $("#arts").hidden = t !== "arts"; $("#people").hidden = t !== "people";
+  if (t === "wall") trim();
+  if (t === "people") loadPeople();
 }
-$("#tabWall").addEventListener("click", () => showTab(false));
-$("#tabArts").addEventListener("click", () => showTab(true));
+$("#tabWall").addEventListener("click", () => showTab("wall"));
+$("#tabArts").addEventListener("click", () => showTab("arts"));
+$("#tabPeople").addEventListener("click", () => showTab("people"));
+
+/* ---------- people: everyone with an account, newest first ---------- */
+async function loadPeople() {
+  const ul = $("#plist");
+  if (!sb) { ul.replaceChildren(el("li", { className: "artempty", textContent: "People show up here once the database is connected." })); return; }
+  const { data, error } = await sb.from("users_profile").select("nick,name,avatar_path").order("created_at", { ascending: false }).limit(200);
+  if (error) return;
+  const row = (href, name, sub, pic, cls) => {
+    const pa = el("span", { className: "pa" });
+    if (pic) pa.style.backgroundImage = `url("${pic}")`; else pa.textContent = ([...name][0] || "?").toUpperCase();
+    return el("li", { className: cls || "" }, el("a", { href }, pa, el("span", {}, el("b", { textContent: name }), el("small", { textContent: sub }))));
+  };
+  ul.replaceChildren(row("./", "448", "the owner of this place", "", "owner"),
+    ...data.map(u => row("?u=" + encodeURIComponent(u.nick), u.name, "@" + u.nick, avatarUrl(u.avatar_path), "")));
+  if (!data.length) ul.append(el("li", { className: "artempty", textContent: "Nobody else here yet. Sign up and be the first." }));
+}
 
 function openArt(id) {
   const a = articles.find(x => x.id === id);
@@ -1509,7 +1627,8 @@ function openArt(id) {
   const body = el("div");
   $("#artBody").replaceChildren(el("h1", { textContent: a.title }), el("p", { className: "ameta", textContent: `${profile.name}, ${fmtDate(a.createdAt)}${a.edited ? ", edited" : ""}` }), body);
   renderMd(body, a.body);
-  $("#artOwner").hidden = !isOwner;
+  $("#artOwner").hidden = !(isOwner || isAdmin);
+  $("#artEdit").hidden = !isOwner; $("#artDel").hidden = !isAdmin;
   if (!$("#dlgArt").open) $("#dlgArt").showModal();
   $("#dlgArt").querySelector(".rscroll").scrollTop = 0;
   history.replaceState(null, "", "#a/" + id);
@@ -1561,7 +1680,7 @@ $("#edForm").addEventListener("submit", e => {
   $("#edSave").disabled = true;
   const job = (id
     ? sb.from("articles").update({ title, body }).eq("id", id).select("id")
-    : sb.from("articles").insert({ title, body }).select("id")).then(must);
+    : sb.from("articles").insert(onMain ? { title, body } : { title, body, user_id: me.id }).select("id")).then(must);
   job.then(() => {
     if (!id) try { localStorage.removeItem(DRAFT); } catch {}
     $("#dlgEdit").close(); say(id ? "Article saved." : "Article published.");
@@ -1571,11 +1690,22 @@ $("#edForm").addEventListener("submit", e => {
 /* =====================================================================
    HIDDEN LOGIN
    ===================================================================== */
-function openLogin() {
-  if (isOwner || $("#dlgLogin").open) return;
-  $("#lerr").textContent = sb ? "" : "Not connected yet: fill in SUPABASE_URL and SUPABASE_ANON_KEY in index.html.";
+function openLogin() { openAuth("login"); }
+let authMode = "login";
+function openAuth(mode) {
+  if (me || $("#dlgLogin").open) return;
+  authMode = mode;
+  const up = mode === "signup";
+  $("#lhead").textContent = up ? "Sign up" : "Log in";
+  $("#lgo").textContent = up ? "Create account" : "Log in";
+  $("#lrepwrap").hidden = !up; $("#lpass2").required = up; $("#lpass2").value = "";
+  $("#lpass").autocomplete = up ? "new-password" : "current-password";
+  $("#lhint").textContent = up ? "Nickname: 3 to 20 latin letters, digits or _. Password: at least 8 characters. There is no e-mail, so keep the password safe: only the site owner can reset it." : "";
+  $("#lswitch").replaceChildren(up ? "Already have an account? " : "No account yet? ",
+    el("button", { type: "button", textContent: up ? "Log in" : "Sign up", onclick: () => { $("#dlgLogin").close(); openAuth(up ? "login" : "signup"); } }));
+  $("#lerr").textContent = sb ? "" : "Not connected to the database yet.";
   $("#lgo").disabled = !sb; $("#lpass").value = "";
-  $("#dlgLogin").showModal();
+  $("#dlgLogin").showModal(); $("#lemail").focus();
 }
 let taps = [];
 $("#photo").addEventListener("click", () => {
@@ -1590,26 +1720,81 @@ addEventListener("keydown", e => {
   typed = (typed + e.key.toLowerCase()).slice(-SECRET_WORD.length);
   if (typed === SECRET_WORD) { typed = ""; openLogin(); }
 });
-$("#loginForm").addEventListener("submit", e => {
+$("#loginForm").addEventListener("submit", async e => {
   e.preventDefault();
   if (!sb) return;
-  $("#lgo").disabled = true; $("#lerr").textContent = "";
-  sb.auth.signInWithPassword({ email: $("#lemail").value.trim(), password: $("#lpass").value }).then(({ error }) => {
+  const id = $("#lemail").value.trim(), pass = $("#lpass").value, err = t => { $("#lerr").textContent = t; };
+  err("");
+  if (authMode === "signup") {
+    const nick = id.toLowerCase();
+    if (!NICK_RE.test(nick)) return err("Nickname: 3 to 20 latin letters, digits or _.");
+    if (RESERVED.includes(nick)) return err("That nickname is reserved.");
+    if (pass.length < 8) return err("The password needs at least 8 characters.");
+    if (pass !== $("#lpass2").value) return err("The two passwords don't match.");
+    $("#lgo").disabled = true;
+    try {
+      const taken = await sb.from("users_profile").select("nick", { count: "exact", head: true }).eq("nick", nick);
+      if (taken.count) return err("That nickname is taken. Try another one.");
+      const { data, error } = await sb.auth.signUp({ email: `${nick}@${NICK_DOMAIN}`, password: pass, options: { data: { nick } } });
+      if (error) return err(/not allowed|disabled/i.test(error.message) ? "Sign-up is closed right now." :
+        error.status === 429 ? "Too many sign-ups from here. Try again later." :
+        /already/i.test(error.message) ? "That nickname is taken. Try another one." :
+        /database/i.test(error.message) ? "That nickname can't be used. Try another one." : error.message);
+      if (!data.session) return err("Account created, but it must be confirmed first. Ask the site owner.");
+      $("#dlgLogin").close();
+      location.href = "?u=" + encodeURIComponent(nick);                      // straight to your new page
+    } finally { $("#lgo").disabled = false; }
+    return;
+  }
+  const email = id.includes("@") ? id : `${id.toLowerCase()}@${NICK_DOMAIN}`;   // the owner logs in with e-mail
+  $("#lgo").disabled = true;
+  sb.auth.signInWithPassword({ email, password: pass }).then(({ error }) => {
     if (!error) { $("#dlgLogin").close(); $("#lpass").value = ""; return; }
-    $("#lerr").textContent = error.status === 429 ? "Too many attempts. Wait a little and try again." :
-      !error.status ? "No connection to the server." : "Wrong email or password.";
+    err(error.status === 429 ? "Too many attempts. Wait a little and try again." :
+      !error.status ? "No connection to the server." : "Wrong nickname or password.");
   }).finally(() => $("#lgo").disabled = false);
 });
 $("#btnLogout").addEventListener("click", () => sb && sb.auth.signOut());
 
+/* ---------- the account links in the header ---------- */
+function renderAcct() {
+  const n = $("#acct");
+  if (!n) return;
+  const link = (text, href, cls) => el("a", { href, textContent: text, className: cls || "" });
+  const btn = (text, fn) => el("button", { type: "button", textContent: text, onclick: fn });
+  if (!sb) { n.replaceChildren(); return; }
+  if (me && (me.admin || me.nick)) {
+    n.replaceChildren(
+      link(me.admin ? "448 (you)" : "@" + me.nick, me.admin ? "./" : "?u=" + encodeURIComponent(me.nick), "me"),
+      ...(onMain ? [] : [link("main page", "./")]),
+      btn("log out", () => sb.auth.signOut()));
+  } else {
+    n.replaceChildren(...(onMain ? [] : [link("main page", "./")]), btn("log in", () => openAuth("login")), btn("sign up", () => openAuth("signup")));
+  }
+}
+
+/* ---------- the owner removes a profile ---------- */
+$("#btnDelUser").addEventListener("click", async () => {
+  if (!isAdmin || !view.id) return;
+  if (!confirm(`Delete @${view.nick} for good? Their profile, photo, posts, articles and follows all go. This can't be undone.`)) return;
+  try {
+    const files = await sb.storage.from("avatars").list(`u/${view.id}`);
+    if (files.data && files.data.length) await sb.storage.from("avatars").remove(files.data.map(f => `u/${view.id}/${f.name}`));
+    const r = await sb.rpc("admin_delete_user", { target: view.id });
+    if (r.error) throw r.error;
+    location.href = "./";
+  } catch (e) { addLocal({ icon: "!", t: "Not deleted: " + guestError(e) }); }
+});
+
 /* ---------- older posts: scroll to the bottom of the wall and the next page arrives ---------- */
-const POST_COLS = "id,text,created_at,edited_at,author,author_key", PAGE = 20;
+const POST_COLS = "id,text,created_at,edited_at,author,author_key,author_nick,user_id,wall", PAGE = 20;
+const wallQuery = q => onMain ? q.is("wall", null) : q.eq("wall", view.id);
 let oldestAt = null, hasOlder = false, loadingOlder = false;
 function checkOlder() {
   if (!sb || !hasOlder || loadingOlder || feed.hidden) return;
   if (feed.scrollTop + feed.clientHeight < feed.scrollHeight - 120) return;
   loadingOlder = true;
-  sb.from("posts").select(POST_COLS).lt("created_at", oldestAt).order("created_at", { ascending: false }).limit(PAGE)
+  wallQuery(sb.from("posts").select(POST_COLS)).lt("created_at", oldestAt).order("created_at", { ascending: false }).limit(PAGE)
     .then(({ data, error }) => {
       loadingOlder = false;
       if (error) return;
@@ -1640,11 +1825,33 @@ async function connect() {
   sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true } });
   window.sb = sb;   // handy in the console; it can only do what the rules allow
 
+  /* who is signed in: the owner, a person with a profile, or nobody */
+  const setMe = async session => {
+    if (!session) { me = null; return; }
+    const id = session.user.id;
+    if (id === OWNER_ID) {
+      const { data } = await sb.from("profile").select("name").eq("id", 1).maybeSingle();
+      me = { id, admin: true, nick: "", name: (data && data.name) || "448" };
+    } else {
+      const { data } = await sb.from("users_profile").select("nick,name").eq("id", id).maybeSingle();
+      me = { id, admin: false, nick: data ? data.nick : "", name: data ? data.name : "" };
+    }
+  };
+  const roles = () => {
+    isAdmin = !!(me && me.admin);
+    isOwner = !!me && !view.missing && (onMain ? me.admin : !!view.id && me.id === view.id);
+  };
+  let lastUid = undefined;
   sb.auth.onAuthStateChange((event, session) => {
-    const was = isOwner;
-    isOwner = !!session;
-    if (isOwner && !was) { input.value = ""; guestFocus = false; say("You're in."); }
-    if (isOwner !== was || event === "INITIAL_SESSION") renderProfile();
+    const uid = session ? session.user.id : null;
+    if (uid === lastUid && event !== "USER_UPDATED") return;              // token refreshes change nothing here
+    lastUid = uid;
+    setTimeout(async () => {                                              // never await Supabase inside this callback
+      const was = isOwner;
+      await setMe(session); roles();
+      if (isOwner && !was) { input.value = ""; guestFocus = false; say("You're in."); }
+      renderProfile(); reloadFollow();
+    });
   });
 
   const applyProfile = row => {
@@ -1654,8 +1861,25 @@ async function connect() {
     avatar = avatarUrl(avatarPath);
     cache(); renderProfile();
   };
+
+  /* someone's page: find the person first, everything else hangs on their id */
+  if (!onMain) {
+    const { data } = await sb.from("users_profile").select("*").eq("nick", view.nick).maybeSingle();
+    if (!data) {
+      view.missing = true;
+      profile = normalize({ name: "@" + view.nick, tagline: "this page doesn't exist", fields: [], links: [] });
+      renderProfile();
+      $("#feed").replaceChildren(el("li", { className: "missing", textContent: `There is no one called @${view.nick} here. Maybe they haven't signed up yet.` }));
+      postsReady(); renderAcct();
+      return;
+    }
+    view.id = data.id;
+    roles(); applyProfile(data);
+  }
+
   const loadArticles = async () => {
-    const { data, error } = await sb.from("articles").select("id,title,body,created_at,updated_at").order("created_at", { ascending: false });
+    const q = sb.from("articles").select("id,title,body,created_at,updated_at");
+    const { data, error } = await (onMain ? q.is("user_id", null) : q.eq("user_id", view.id)).order("created_at", { ascending: false });
     if (error) return;
     articles = data.map(x => {
       const c = Date.parse(x.created_at) || Date.now(), u = Date.parse(x.updated_at) || c;
@@ -1670,30 +1894,25 @@ async function connect() {
 
   /* live changes first, then the first load, so nothing slips through in between */
   sb.channel("db")
-    .on("postgres_changes", { event: "UPDATE", schema: "public", table: "profile" }, p => {
+    .on("postgres_changes", onMain ? { event: "UPDATE", schema: "public", table: "profile" }
+                                   : { event: "UPDATE", schema: "public", table: "users_profile", filter: `id=eq.${view.id}` }, p => {
       if (isOwner && Date.now() - lastSave < 1500) return;   // our own edit, already on screen
       applyProfile(p.new);
     })
     .on("postgres_changes", { event: "*", schema: "public", table: "posts" }, p => {
-      if (p.eventType === "DELETE") { if (p.old && p.old.id) { removePost(p.old.id); realTotal = Math.max(0, realTotal - 1); } }
-      else { if (p.eventType === "INSERT") realTotal++; upsertPost(p.new, false); }
+      if (p.eventType === "DELETE") { if (p.old && p.old.id && realById.has(p.old.id)) { removePost(p.old.id); realTotal = Math.max(0, realTotal - 1); } }
+      else if (onThisWall(p.new)) { if (p.eventType === "INSERT") realTotal++; upsertPost(p.new, false); }
       trim();
     })
     .on("postgres_changes", { event: "*", schema: "public", table: "articles" }, reloadArticles)
-    .on("postgres_changes", { event: "UPDATE", schema: "public", table: "site_stats" }, p => {
-      if (p.new && typeof p.new.followers === "number") { followerCount = p.new.followers; showFollowers(); }
-    })
+    .on("postgres_changes", { event: "UPDATE", schema: "public", table: "site_stats" }, reloadFollow)
+    .on("postgres_changes", { event: "*", schema: "public", table: "follows" }, reloadFollow)
     .subscribe(status => { if (status === "SUBSCRIBED") { /* nothing else to do */ } });
 
-  sb.from("profile").select("*").eq("id", 1).maybeSingle().then(({ data }) => applyProfile(data));
-  sb.from("site_stats").select("followers").eq("id", 1).maybeSingle().then(({ data }) => {
-    if (data && typeof data.followers === "number") { followerCount = data.followers; showFollowers(); }
-  });
-  sb.rpc("is_following", { token: guest.token }).then(({ data, error }) => {   // the server knows best
-    if (!error && typeof data === "boolean" && data !== following) setFollowing(data);
-  });
+  if (onMain) sb.from("profile").select("*").eq("id", 1).maybeSingle().then(({ data }) => applyProfile(data));
+  reloadFollow();
   loadArticles();
-  sb.from("posts").select(POST_COLS, { count: "exact" }).order("created_at", { ascending: false }).limit(PAGE)
+  wallQuery(sb.from("posts").select(POST_COLS, { count: "exact" })).order("created_at", { ascending: false }).limit(PAGE)
     .then(({ data, count, error }) => {
       if (!error) {
         realTotal = count || 0;
@@ -1706,7 +1925,8 @@ async function connect() {
     }, () => postsReady());
 
   /* "now on page": Realtime Presence, nothing is written to the database */
-  const room = sb.channel("online", { config: { presence: { key: crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) } } });
+  renderAcct();
+  const room = sb.channel(onMain ? "online" : "online:" + view.id, { config: { presence: { key: crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) } } });
   room.on("presence", { event: "sync" }, () => {
     $("#online").textContent = "now on page: " + Math.max(1, Object.keys(room.presenceState()).length);
   }).subscribe(status => { if (status === "SUBSCRIBED") room.track({ at: Date.now() }); });
@@ -1939,6 +2159,7 @@ connect().catch(e => console.warn("status448: database offline", e)).finally(() 
 
 (async function run() {
   await introGate;                                  // the wall comes alive when the intro says so
+  if (!onMain) return;                              // people's pages have no simulated chatter
   await Promise.race([firstPosts, sleep(1800)]);
   await sleep(250);
   if (realTotal < FADE_OUT_AT)
