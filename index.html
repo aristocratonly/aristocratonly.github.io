@@ -221,7 +221,10 @@ b{font-weight:700}
   border:1px solid #b79f9b;background:#fff;padding:3px 5px;border-radius:0;
 }
 .composer input{flex:1;min-width:0}
-.feed{list-style:none;flex:1;min-height:0;overflow:hidden}
+.feed{list-style:none;flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.feed::-webkit-scrollbar{width:6px}
+.feed::-webkit-scrollbar-thumb{background:var(--line)}
+.feedend{padding:10px 8px 12px;text-align:center;color:var(--muted);font-size:10px}
 .post{display:grid;grid-template-rows:0fr;transition:grid-template-rows .42s cubic-bezier(.2,.7,.2,1)}
 .post.in{grid-template-rows:1fr}
 .clip{overflow:hidden;min-height:0}
@@ -1124,16 +1127,15 @@ function refreshTimes() { for (const li of feed.children) stamp(li); }
 function refreshPosts() { for (const li of feed.children) li._fill(); }
 
 /* Simulated posts go first when space runs out; real ones only after that. */
+/* The wall scrolls now, so nothing real is ever removed to make room.
+   Only the simulated chatter is kept in check: it retires once there are
+   enough real posts, and never grows past 40 items. */
+const SOFT_MAX = 40;
 function trim() {
   if (realTotal >= FADE_OUT_AT) feed.querySelectorAll("[data-kind=fake]").forEach(n => n.remove());
-  let guard = 80;
-  while (guard-- && feed.children.length > 1 && feed.scrollHeight > feed.clientHeight + 1) {
-    const soft = feed.querySelectorAll("[data-kind=fake],[data-kind=local]");
-    const victim = soft.length ? soft[soft.length - 1] : feed.lastElementChild;
-    if (victim._editing) break;
-    if (victim.dataset.id) realById.delete(victim.dataset.id);
-    victim.remove();
-  }
+  const soft = [...feed.querySelectorAll("[data-kind=fake],[data-kind=local]")];
+  for (let i = soft.length - 1; i >= SOFT_MAX; i--) if (!soft[i]._editing) soft[i].remove();
+  if (typeof checkOlder === "function") checkOlder();
 }
 function addPost({ kind, icon, me, fill, ts = Date.now(), sfx = "", quiet, id }) {
   const li = el("li", { className: "post" + (quiet ? " old" : "") });
@@ -1600,6 +1602,25 @@ $("#loginForm").addEventListener("submit", e => {
 });
 $("#btnLogout").addEventListener("click", () => sb && sb.auth.signOut());
 
+/* ---------- older posts: scroll to the bottom of the wall and the next page arrives ---------- */
+const POST_COLS = "id,text,created_at,edited_at,author,author_key", PAGE = 20;
+let oldestAt = null, hasOlder = false, loadingOlder = false;
+function checkOlder() {
+  if (!sb || !hasOlder || loadingOlder || feed.hidden) return;
+  if (feed.scrollTop + feed.clientHeight < feed.scrollHeight - 120) return;
+  loadingOlder = true;
+  sb.from("posts").select(POST_COLS).lt("created_at", oldestAt).order("created_at", { ascending: false }).limit(PAGE)
+    .then(({ data, error }) => {
+      loadingOlder = false;
+      if (error) return;
+      data.forEach(r => upsertPost(r, true));
+      if (data.length) oldestAt = data[data.length - 1].created_at;
+      hasOlder = data.length === PAGE;
+      checkOlder();                                   // a tall screen may still have room
+    }, () => { loadingOlder = false; });
+}
+feed.addEventListener("scroll", checkOlder, { passive: true });
+
 /* =====================================================================
    SUPABASE: live profile, posts, articles (Realtime), "now on page" (Presence)
    ===================================================================== */
@@ -1672,9 +1693,15 @@ async function connect() {
     if (!error && typeof data === "boolean" && data !== following) setFollowing(data);
   });
   loadArticles();
-  sb.from("posts").select("id,text,created_at,edited_at,author,author_key", { count: "exact" }).order("created_at", { ascending: false }).limit(20)
+  sb.from("posts").select(POST_COLS, { count: "exact" }).order("created_at", { ascending: false }).limit(PAGE)
     .then(({ data, count, error }) => {
-      if (!error) { realTotal = count || 0; data.slice().reverse().forEach(r => upsertPost(r, true)); trim(); }
+      if (!error) {
+        realTotal = count || 0;
+        data.slice().reverse().forEach(r => upsertPost(r, true));
+        oldestAt = data.length ? data[data.length - 1].created_at : null;
+        hasOlder = data.length === PAGE;
+        trim();
+      }
       postsReady();
     }, () => postsReady());
 
