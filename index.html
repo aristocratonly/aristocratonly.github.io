@@ -3,6 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+/* SHELL. Opened directly, this page becomes a thin shell: it holds the music and shows the
+   site in a full-window frame. Moving between sections reloads only the frame, so the music
+   keeps playing. <plaintext> swallows the rest of this file, so nothing else runs here. */
+(function () {
+  if (window !== top || /[?&]noshell(=|&|$)/.test(location.search)) return;
+  window.__shell448 = true;
+  document.write('<style>html,body{margin:0;height:100%;overflow:hidden;background:#fff}#f448{position:fixed;inset:0;width:100%;height:100%;border:0;display:block}</style>' +
+    '<audio id="audio" src="music.mp3" preload="none"></audio><iframe id="f448" title="status448" allow="autoplay; clipboard-write"></iframe>' +
+    '<script>document.getElementById("f448").src = location.href;<\/script><plaintext hidden>');
+})();
+</script>
 <title>448 | status448</title>
 <meta name="description" content="448 / тринадцатый. FullStack Developer, Georgia. A profile on status448, a social network with a population of one.">
 <meta property="og:title" content="448 | status448">
@@ -1627,20 +1639,41 @@ function addMe() {
 /* =====================================================================
    PLAYER
    ===================================================================== */
-const audio = $("#audio"), player = $("#player");
+/* inside the shell (see the top of the file) the music lives in the shell, so it survives page changes */
+const host = (() => { try { return window !== top && parent.__shell448 ? parent : null; } catch { return null; } })();
+const audio = host ? host.document.getElementById("audio") : $("#audio"), player = $("#player");
+if (host) {
+  $("#audio").remove();
+  /* the address bar and the tab title follow the page in the frame */
+  const sync = () => { try { host.history.replaceState(null, "", location.href); host.document.title = document.title; } catch {} };
+  for (const k of ["pushState", "replaceState"]) { const f = history[k].bind(history); history[k] = (...a) => { f(...a); sync(); }; }
+  addEventListener("hashchange", sync);
+  new MutationObserver(sync).observe(document.querySelector("title"), { childList: true, characterData: true, subtree: true });
+  sync();
+  /* links to other sites open over the whole window, not inside the frame */
+  addEventListener("click", e => {
+    const a = e.target.closest && e.target.closest("a[href]");
+    if (a && !a.target && a.origin !== location.origin) a.target = "_top";
+  }, true);
+}
+const audioOff = [];
+const onAudio = (type, fn) => { audio.addEventListener(type, fn); audioOff.push(() => audio.removeEventListener(type, fn)); };
+addEventListener("pagehide", () => { audioOff.forEach(f => f()); if (fadeIv && !audio.paused) audio.volume = .85; });
 /* Music plays from the first key or click (browsers allow sound only after one).
    The play button is the switch; turning it off is remembered for the next visit. */
-const MUSIC_OFF = "s448-music-off", AC = window.AudioContext || window.webkitAudioContext;
+const MUSIC_OFF = "s448-music-off", AW = host || window, AC = AW.AudioContext || AW.webkitAudioContext;
 let musicWanted = true;
 try { musicWanted = localStorage.getItem(MUSIC_OFF) !== "1"; } catch {}
-let mctx = null, analyser = null, bins = null, fadeIv = 0;
+/* the audio graph is made in the shell too: a source can be hooked to an element only once */
+let { mctx = null, analyser = null, bins = null } = AW.__m448 || {}, fadeIv = 0;
 function hookAnalyser() {
   if (mctx || !AC) return;
   try {
     mctx = new AC();
     analyser = mctx.createAnalyser(); analyser.fftSize = 1024; analyser.smoothingTimeConstant = .5;
     mctx.createMediaElementSource(audio).connect(analyser); analyser.connect(mctx.destination);
-    bins = new Uint8Array(analyser.frequencyBinCount);
+    bins = new AW.Uint8Array(analyser.frequencyBinCount);
+    AW.__m448 = { mctx, analyser, bins };
   } catch { mctx = analyser = null; }
 }
 function startMusic() {                      // call it from inside a key or click handler
@@ -1684,10 +1717,11 @@ $("#play").addEventListener("click", () => {
   if (audio.paused) { musicWanted = true; try { localStorage.removeItem(MUSIC_OFF); } catch {} startMusic(); }
   else { musicWanted = false; try { localStorage.setItem(MUSIC_OFF, "1"); } catch {} clearInterval(fadeIv); audio.pause(); }
 });
-audio.addEventListener("play", () => { player.classList.add("playing"); setSwitch(true); });
-audio.addEventListener("pause", () => { player.classList.remove("playing"); setSwitch(false); });
-audio.addEventListener("timeupdate", () => { if (audio.duration) $("#prog").style.width = (audio.currentTime / audio.duration * 100) + "%"; });
-audio.addEventListener("error", () => { player.classList.remove("playing"); $("#play").disabled = true; $("#play").title = "music.mp3 was not found next to index.html"; });
+onAudio("play", () => { player.classList.add("playing"); setSwitch(true); });
+onAudio("pause", () => { player.classList.remove("playing"); setSwitch(false); });
+onAudio("timeupdate", () => { if (audio.duration) $("#prog").style.width = (audio.currentTime / audio.duration * 100) + "%"; });
+onAudio("error", () => { player.classList.remove("playing"); $("#play").disabled = true; $("#play").title = "music.mp3 was not found next to index.html"; });
+if (!audio.paused) { player.classList.add("playing"); setSwitch(true); }
 $("#pbar").addEventListener("click", e => {
   if (!audio.duration) return;
   const r = e.currentTarget.getBoundingClientRect();
