@@ -2344,8 +2344,8 @@ async function loadFriends() {
     }) : [el("li", { className: "fempty", textContent: empty })])));
   box.replaceChildren(
     section("Friends", friends, "No friends yet. A friend is someone you follow who follows you back."),
-    section("Following", following, "You don't follow anyone yet."),
-    section("Followers", followers, "Nobody follows you yet."));
+    section("Following", following.filter(id => !friends.includes(id)), friends.length ? "No one else — everyone you follow follows you back." : "You don't follow anyone yet."),
+    section("Followers", followers.filter(id => !friends.includes(id)), friends.length ? "No one else — all your followers are friends." : "Nobody follows you yet."));
 }
 
 function chatChange(p) {
