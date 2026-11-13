@@ -333,28 +333,28 @@ dt .inl input{width:70px}
 @media (prefers-reduced-motion:reduce){.badge{transition:none}}
 
 /* ---------- wall tabs + articles ---------- */
-/* ---------- left menu (every page) ---------- */
-.navbox > h2{display:flex}
-.nav{list-style:none}
-.nav a,.nav button{display:flex;align-items:center;gap:8px;width:100%;padding:6px 8px;border:0;border-bottom:1px solid var(--tint);
-  font:inherit;text-align:left;color:var(--link);background:none;cursor:pointer;text-decoration:none}
-.nav li:last-child a,.nav li:last-child button{border-bottom:0}
-.nav a:hover,.nav button:hover{background:#fbf6f4;text-decoration:none}
-.nav .on{font-weight:700;color:var(--crimson);box-shadow:inset 3px 0 var(--crimson);background:#fbf3f1}
-.nav .ni{flex:none;width:14px;text-align:center;color:var(--muted);font-weight:400}
+/* ---------- the menu bar under the header (every page) ---------- */
+.topnav{flex:none;display:flex;align-items:stretch;background:#f8f0ee;border-bottom:1px solid var(--line)}
+.nav{list-style:none;display:flex;flex:1;min-width:0}
+.nav a{display:flex;align-items:center;gap:7px;padding:7px 14px;border-right:1px solid var(--line);color:var(--link);text-decoration:none;white-space:nowrap}
+.nav a:hover{background:#fff;text-decoration:none}
+.nav .on{font-weight:700;color:var(--crimson);background:#fff;box-shadow:inset 0 -2px var(--crimson)}
+.nav .ni{color:var(--muted);font-weight:400}
 .nav .on .ni{color:var(--crimson)}
-.nav .mchat{display:none}
+.topnav .player{flex:none;width:250px;border:0;border-left:1px solid var(--line);background:none}
+.topnav .player > h2{display:none}
+.topnav .player .pad{padding:5px 10px}
 
 /* ---------- avatars ---------- */
 .av{flex:none;display:block;width:36px;height:36px;border:1px solid var(--line);background:#f3e7e4 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f3e7e4'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23c9a5a2'/%3E%3Cpath d='M12 100c2-24 18-34 38-34s36 10 38 34z' fill='%23c9a5a2'/%3E%3C/svg%3E") center/cover no-repeat}
 .av.sm{width:22px;height:22px}
 .ico svg{width:100%;height:100%;display:block}
 
-/* ---------- the feed page: menu | feed | chat ---------- */
-.fgrid{grid-template-columns:176px minmax(0,1fr) minmax(0,290px);grid-template-rows:minmax(0,1fr);grid-template-areas:"fleft fmain fchat"}
-.f-left{grid-area:fleft;min-height:0;display:flex;flex-direction:column;gap:10px}
-.f-main{grid-area:fmain;min-height:0;display:flex;flex-direction:column}
-.f-chat{grid-area:fchat;min-height:0;display:flex;flex-direction:column}
+/* ---------- the feed, friends and chat pages: one wide column ---------- */
+.fgrid{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);grid-template-areas:"fmain"}
+.f-main,.f-chat{grid-area:fmain;min-height:0;display:flex;flex-direction:column}
+.f-main .flist,.f-main .fview{padding:0 max(0px,calc((100% - 720px) / 2))}
+.f-chat .clist{padding-inline:max(0px,calc((100% - 720px) / 2))}
 .fcompose{flex:none;display:flex;flex-direction:column;gap:6px;padding:8px;background:var(--tint);border-bottom:1px solid var(--line)}
 .fcompose textarea{width:100%;resize:none;font:inherit;color:var(--ink);background:#fff;border:1px solid #b79f9b;padding:4px 6px;border-radius:0}
 .frow{display:flex;align-items:center;gap:6px}
@@ -512,25 +512,19 @@ dt .inl input{width:70px}
   .grid{
     gap:8px;padding:8px;
     grid-template-columns:100px minmax(0,1fr);
-    grid-template-rows:auto auto auto auto minmax(0,1fr);
-    grid-template-areas:"nav nav" "photo info" "friends friends" "player player" "wall wall";
+    grid-template-rows:auto auto minmax(0,1fr);
+    grid-template-areas:"photo info" "friends friends" "wall wall";
   }
   .a-photo{display:contents}
-  /* the menu becomes one row of tabs */
-  .navbox{grid-area:nav}
-  .navbox > h2{display:none}
-  .nav{display:flex}
+  /* menu: four equal tabs, the player gets its own row */
+  .grid.fgrid{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);grid-template-areas:"fmain"}
+  .topnav{flex-wrap:wrap}
+  .topnav .nav{flex:1 1 100%}
   .nav li{flex:1;min-width:0}
-  .nav a,.nav button{justify-content:center;border-bottom:0;border-right:1px solid var(--tint);padding:6px 4px;font-size:11px}
-  .nav li:last-child a,.nav li:last-child button{border-right:0}
-  .nav .on{box-shadow:inset 0 -2px var(--crimson)}
+  .nav a{justify-content:center;padding:7px 4px;font-size:11px}
+  .nav li:last-child a{border-right:0}
   .nav .ni{display:none}
-  .fgrid .nav .mchat{display:flex}
-  .fgrid{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);grid-template-areas:"fleft" "fmain"}
-  .f-left .player{display:none}
-  .f-chat{grid-area:fmain;display:none}
-  .fgrid.chat .f-main{display:none}
-  .fgrid.chat .f-chat{display:flex}
+  .topnav .player{width:100%;border-left:0;border-top:1px solid var(--line)}
   .fcompose textarea,.cinput input,.cform input{font-size:16px}
   .b-pic{grid-area:photo;align-self:start}
   .b-pic .pad{padding:5px}
@@ -616,7 +610,7 @@ html.ip.show .site{opacity:1;transform:none;transition:opacity .9s ease,transfor
 </div>
 <script>
 /* ?nointro: straight to the site (handy while editing the profile). */
-if (/[?&](nointro(=|&|$)|u=|friends)/.test(location.search)) document.getElementById("intro").remove();   // the intro opens the feed only
+if (/[?&](nointro(=|&|$)|u=|friends|chat)/.test(location.search)) document.getElementById("intro").remove();   // the intro opens the feed only
 else document.documentElement.classList.add("ip");
 </script>
 
@@ -626,6 +620,8 @@ else document.documentElement.classList.add("ip");
     <p class="tagline">HTTP 448: <em id="tagline"></em></p>
     <nav class="acct" id="acct" aria-label="Account"></nav>
   </header>
+
+  <div class="topnav" id="topnav"><ul class="nav navlist" aria-label="Menu"></ul></div>
 
   <div class="adminbar" id="adminbar" hidden>
     <p><b>Admin.</b> You can delete this profile together with its posts and articles.</p>
@@ -640,9 +636,6 @@ else document.documentElement.classList.add("ip");
   </div>
 
   <main class="grid fgrid" id="hubPage" hidden>
-    <section class="f-left" aria-label="Menu">
-      <nav class="box navbox"><h2>Menu</h2><ul class="nav navlist"></ul></nav>
-    </section>
     <section class="f-main box" aria-label="Feed">
       <h2><span class="wtabs" role="tablist" id="ftabs"><button type="button" class="wtab" id="ftAll" role="tab" aria-selected="true">All</button><button type="button" class="wtab" id="ftFollow" role="tab" aria-selected="false">Following</button></span><span id="fonline"></span></h2>
       <form class="fcompose" id="fcompose" autocomplete="off">
@@ -652,7 +645,7 @@ else document.documentElement.classList.add("ip");
       <ul class="flist" id="flist"></ul>
       <div class="fview" id="friendsView" hidden></div>
     </section>
-    <section class="f-chat box" aria-label="Chat room">
+    <section class="f-chat box" aria-label="Chat room" hidden>
       <h2>Chat room <span id="chatcount"></span></h2>
       <ul class="clist" id="clist"></ul>
       <form class="cform" id="cform" autocomplete="off"><input id="ctext" maxlength="500" placeholder="Say something" aria-label="Chat message"><button type="submit" class="btn" id="csend">Send</button></form>
@@ -662,7 +655,6 @@ else document.documentElement.classList.add("ip");
   <main class="grid" id="profilePage">
 
     <section class="a-photo" aria-label="Picture">
-      <nav class="box navbox"><h2>Menu</h2><ul class="nav navlist"></ul></nav>
       <div class="box b-pic">
         <h2>Picture <span id="followers"></span></h2>
         <div class="pad">
@@ -840,13 +832,13 @@ const NICK_DOMAIN = "users.aristocratonly.github.io";
 const NICK_RE = /^[a-z0-9_]{3,20}$/;
 const RESERVED = ["448", "admin", "owner", "status448", "root", "support", "moderator", "system", "null"];
 /* ?u=nick opens that person's page; without it, the owner's main page */
-/* Pages:  ./ the feed  |  ?friends  |  ?u=448 the owner's profile  |  ?u=nick someone's profile */
+/* Pages:  ./ the feed  |  ?friends  |  ?chat  |  ?u=448 the owner's profile  |  ?u=nick someone's profile */
 const view = (() => {
   const q = new URLSearchParams(location.search), n = (q.get("u") || "").toLowerCase();
   const v = kind => ({ kind, nick: kind === "user" ? n : "", id: null, missing: false });
-  return n === "448" ? v("main") : NICK_RE.test(n) ? v("user") : q.has("friends") ? v("friends") : v("feed");
+  return n === "448" ? v("main") : NICK_RE.test(n) ? v("user") : q.has("friends") ? v("friends") : q.has("chat") ? v("chat") : v("feed");
 })();
-const onMain = view.kind === "main", onUser = view.kind === "user", onHub = view.kind === "feed" || view.kind === "friends";
+const onMain = view.kind === "main", onUser = view.kind === "user", onHub = ["feed", "friends", "chat"].includes(view.kind);
 const OWNER_HREF = "?u=448";
 
 /* =====================================================================
@@ -1966,23 +1958,23 @@ function avatarEl(a, small) {
 const whenEl = ms => { const t = el("span", { className: "when" }); t.dataset.at = ms; t.textContent = ago(Math.max(0, (Date.now() - ms) / 1000)); return t; };
 setInterval(() => document.querySelectorAll("[data-at]").forEach(t => t.textContent = ago(Math.max(0, (Date.now() - t.dataset.at) / 1000))), 15000);
 
-/* the menu on the left */
+/* the menu bar */
 function renderNav() {
   const mine = me && (me.admin ? OWNER_HREF : me.nick ? "?u=" + encodeURIComponent(me.nick) : "");
-  const onMine = me && ((me.admin && onMain) || (!me.admin && onUser && view.nick === me.nick));
-  const item = (icon, label, href, on, extra) => {
-    const kids = [el("span", { className: "ni", textContent: icon, ariaHidden: "true" }), label];
-    const n = href ? el("a", { href, className: on ? "on" : "" }, ...kids) : el("button", { type: "button", className: on ? "on" : "" }, ...kids);
-    if (extra) extra(n);
-    return el("li", { className: n.classList.contains("mchat") ? "mchat" : "" }, n);
+  const onMine = !!me && ((me.admin && onMain) || (!me.admin && onUser && view.nick === me.nick));
+  const item = (icon, label, href, on, click) => {
+    const a = el("a", { href: href || "#", className: on ? "on" : "" }, el("span", { className: "ni", textContent: icon }), label);
+    if (on) a.setAttribute("aria-current", "page");
+    if (click) a.addEventListener("click", e => { e.preventDefault(); click(); });
+    return el("li", {}, a);
   };
-  const lists = document.querySelectorAll(".navlist");
-  lists.forEach(ul => ul.replaceChildren(
-    item("☺", me ? "My account" : "Log in", mine || null, onMine, n => { if (!mine) n.onclick = () => openAuth("login"); }),
+  $(".navlist").replaceChildren(
+    item("☺", me ? "My account" : "Log in", mine, onMine, mine ? null : () => openAuth("login")),
     item("♥", "My friends", "?friends", view.kind === "friends"),
     item("≡", "Feed", "./", view.kind === "feed"),
-    ...(onHub ? [item("✉", "Chat", null, false, n => { n.classList.add("mchat"); n.onclick = () => $("#hubPage").classList.toggle("chat"); })] : [])));
+    item("✉", "Chat", "?chat", view.kind === "chat"));
 }
+$("#topnav").append($("#player"));          // the music player sits in the menu bar on every page
 
 /* =====================================================================
    THE FEED, FRIENDS AND THE CHAT ROOM (./ and ?friends)
@@ -2253,7 +2245,7 @@ async function loadFriends() {
 /* the realtime wiring of the hub */
 function startHub() {
   $("#profilePage").hidden = true; $("#hubPage").hidden = false;
-  $("#hubPage .f-left").append($("#player"));                 // the music player moves into the menu column
+  $(".f-main").hidden = view.kind === "chat"; $(".f-chat").hidden = view.kind !== "chat";
   $("#flist").hidden = view.kind !== "feed"; $("#friendsView").hidden = view.kind !== "friends";
   $("#ftabs").hidden = view.kind !== "feed";
   if (view.kind === "friends") $("#ftabs").before(el("span", { textContent: "My friends", style: "color:#fff;font-weight:700" }));
@@ -2324,7 +2316,7 @@ async function connect() {
       await setMe(session); roles();
       if (isOwner && !was) { input.value = ""; guestFocus = false; say("You're in."); }
       renderProfile(); reloadFollow();
-      if (onHub && sb) { followedIds = null; view.kind === "feed" ? loadFeed(true) : loadFriends(); loadChat(); }
+      if (onHub && sb) { followedIds = null; if (view.kind === "feed") loadFeed(true); else if (view.kind === "friends") loadFriends(); loadChat(); }
     });
   });
 
@@ -2365,7 +2357,7 @@ async function connect() {
         if (view.kind === "friends") loadFriends();
       })
       .subscribe();
-    view.kind === "feed" ? loadFeed(true) : loadFriends();
+    if (view.kind === "feed") loadFeed(true); else if (view.kind === "friends") loadFriends();
     loadChat();
     renderAcct();
     startPresence();
