@@ -333,6 +333,83 @@ dt .inl input{width:70px}
 @media (prefers-reduced-motion:reduce){.badge{transition:none}}
 
 /* ---------- wall tabs + articles ---------- */
+/* ---------- left menu (every page) ---------- */
+.navbox > h2{display:flex}
+.nav{list-style:none}
+.nav a,.nav button{display:flex;align-items:center;gap:8px;width:100%;padding:6px 8px;border:0;border-bottom:1px solid var(--tint);
+  font:inherit;text-align:left;color:var(--link);background:none;cursor:pointer;text-decoration:none}
+.nav li:last-child a,.nav li:last-child button{border-bottom:0}
+.nav a:hover,.nav button:hover{background:#fbf6f4;text-decoration:none}
+.nav .on{font-weight:700;color:var(--crimson);box-shadow:inset 3px 0 var(--crimson);background:#fbf3f1}
+.nav .ni{flex:none;width:14px;text-align:center;color:var(--muted);font-weight:400}
+.nav .on .ni{color:var(--crimson)}
+.nav .mchat{display:none}
+
+/* ---------- avatars ---------- */
+.av{flex:none;display:block;width:36px;height:36px;border:1px solid var(--line);background:#f3e7e4 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f3e7e4'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23c9a5a2'/%3E%3Cpath d='M12 100c2-24 18-34 38-34s36 10 38 34z' fill='%23c9a5a2'/%3E%3C/svg%3E") center/cover no-repeat}
+.av.sm{width:22px;height:22px}
+.ico svg{width:100%;height:100%;display:block}
+
+/* ---------- the feed page: menu | feed | chat ---------- */
+.fgrid{grid-template-columns:176px minmax(0,1fr) minmax(0,290px);grid-template-rows:minmax(0,1fr);grid-template-areas:"fleft fmain fchat"}
+.f-left{grid-area:fleft;min-height:0;display:flex;flex-direction:column;gap:10px}
+.f-main{grid-area:fmain;min-height:0;display:flex;flex-direction:column}
+.f-chat{grid-area:fchat;min-height:0;display:flex;flex-direction:column}
+.fcompose{flex:none;display:flex;flex-direction:column;gap:6px;padding:8px;background:var(--tint);border-bottom:1px solid var(--line)}
+.fcompose textarea{width:100%;resize:none;font:inherit;color:var(--ink);background:#fff;border:1px solid #b79f9b;padding:4px 6px;border-radius:0}
+.frow{display:flex;align-items:center;gap:6px}
+.fhint{flex:1;min-width:0;color:var(--muted);font-size:10px}
+.flist,.clist{list-style:none;flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.fitem{display:flex;gap:9px;padding:9px 10px;border-bottom:1px solid var(--tint)}
+.fitem.new{animation:flash 2.6s ease-out}
+.fbody{flex:1;min-width:0}
+.fhead{font-size:11px;color:var(--muted)}
+.fhead a{font-weight:700;color:var(--link)}
+.when{color:var(--muted);font-size:10px;margin-left:5px;font-weight:400}
+.ftext{white-space:pre-wrap;overflow-wrap:anywhere;margin:2px 0 5px}
+.fart{display:block;width:100%;margin:4px 0 6px;padding:8px 10px;text-align:left;font:inherit;color:inherit;cursor:pointer;
+  background:#fffdfc;border:1px solid var(--line);box-shadow:inset 3px 0 var(--crimson)}
+.fart:hover{border-color:#c49c98;background:#fff}
+.fart b{display:block;color:var(--crimson);font:700 14px/1.3 var(--serif)}
+.fart p{color:#62575a;font-size:11px;margin:3px 0}
+.fart small{color:var(--link);font-size:10px}
+.fctl{display:flex;flex-wrap:wrap;gap:12px;font-size:10px}
+.fctl button{font:inherit;color:var(--link);background:none;border:0;padding:0;cursor:pointer}
+.fctl button:hover{text-decoration:underline}
+.fctl .del{color:#a3242f}
+.fcom{margin-top:7px;padding-left:9px;border-left:2px solid var(--tint)}
+.citem{display:flex;gap:7px;padding:4px 0}
+.citem .cb{flex:1;min-width:0;font-size:11px}
+.citem .cb a{font-weight:700;color:var(--link)}
+.citem .ct{white-space:pre-wrap;overflow-wrap:anywhere}
+.citem .fctl{margin-top:1px}
+.cinput{display:flex;gap:4px;margin-top:5px}
+.cinput input{flex:1;min-width:0;font:inherit;color:var(--ink);border:1px solid #b79f9b;background:#fff;padding:2px 5px;border-radius:0}
+.cinput .btn{padding:2px 8px}
+.fempty{padding:16px 12px;color:var(--muted)}
+.fempty button{font:inherit;color:var(--link);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+.pedit2{display:flex;flex-direction:column;gap:5px;margin:3px 0 6px}
+.pedit2 textarea{width:100%;resize:vertical;font:inherit;border:1px solid #b79f9b;padding:4px 6px}
+.pedit2 div{display:flex;gap:6px}
+
+/* chat room */
+.clist{padding:4px 0}
+.cmsg{display:flex;gap:7px;padding:4px 8px}
+.cmsg .cb{flex:1;min-width:0;font-size:11px;line-height:1.35}
+.cmsg .cb a{font-weight:700;color:var(--link)}
+.cmsg .ct{display:block;white-space:pre-wrap;overflow-wrap:anywhere}
+.cmsg .x{flex:none;align-self:flex-start;font:12px/1 var(--sans);color:var(--muted);background:none;border:0;cursor:pointer;opacity:0;padding:0 2px}
+.cmsg:hover .x{opacity:1}
+.cmsg .x:hover{color:#a3242f}
+.cform{flex:none;display:flex;gap:5px;padding:6px 8px;background:var(--tint);border-top:1px solid var(--line)}
+.cform input{flex:1;min-width:0;font:inherit;color:var(--ink);background:#fff;border:1px solid #b79f9b;padding:3px 5px;border-radius:0}
+
+/* friends */
+.fview{flex:1;min-height:0;overflow-y:auto}
+.fsec > h3{font-size:11px;color:var(--crimson);padding:9px 10px 4px;border-bottom:1px solid var(--tint)}
+.fsec > h3 span{color:var(--muted);font-weight:400}
+.fsec .plist a{padding-left:10px}
+
 /* ---------- account links in the header ---------- */
 .acct{display:flex;align-items:baseline;gap:10px;font-size:11px;white-space:nowrap;margin-left:12px}
 .acct a,.acct button{font:inherit;color:#f0d2d4;background:none;border:0;padding:0;cursor:pointer;text-decoration:none}
@@ -435,10 +512,26 @@ dt .inl input{width:70px}
   .grid{
     gap:8px;padding:8px;
     grid-template-columns:100px minmax(0,1fr);
-    grid-template-rows:auto auto auto minmax(0,1fr);
-    grid-template-areas:"photo info" "friends friends" "player player" "wall wall";
+    grid-template-rows:auto auto auto auto minmax(0,1fr);
+    grid-template-areas:"nav nav" "photo info" "friends friends" "player player" "wall wall";
   }
   .a-photo{display:contents}
+  /* the menu becomes one row of tabs */
+  .navbox{grid-area:nav}
+  .navbox > h2{display:none}
+  .nav{display:flex}
+  .nav li{flex:1;min-width:0}
+  .nav a,.nav button{justify-content:center;border-bottom:0;border-right:1px solid var(--tint);padding:6px 4px;font-size:11px}
+  .nav li:last-child a,.nav li:last-child button{border-right:0}
+  .nav .on{box-shadow:inset 0 -2px var(--crimson)}
+  .nav .ni{display:none}
+  .fgrid .nav .mchat{display:flex}
+  .fgrid{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);grid-template-areas:"fleft" "fmain"}
+  .f-left .player{display:none}
+  .f-chat{grid-area:fmain;display:none}
+  .fgrid.chat .f-main{display:none}
+  .fgrid.chat .f-chat{display:flex}
+  .fcompose textarea,.cinput input,.cform input{font-size:16px}
   .b-pic{grid-area:photo;align-self:start}
   .b-pic .pad{padding:5px}
   .photo{aspect-ratio:1}
@@ -523,7 +616,7 @@ html.ip.show .site{opacity:1;transform:none;transition:opacity .9s ease,transfor
 </div>
 <script>
 /* ?nointro: straight to the site (handy while editing the profile). */
-if (/[?&](nointro(=|&|$)|u=)/.test(location.search)) document.getElementById("intro").remove();   // people's pages open straight away
+if (/[?&](nointro(=|&|$)|u=|friends)/.test(location.search)) document.getElementById("intro").remove();   // the intro opens the feed only
 else document.documentElement.classList.add("ip");
 </script>
 
@@ -546,9 +639,30 @@ else document.documentElement.classList.add("ip");
     <button type="button" class="btn plain" id="btnLogout">Log out</button>
   </div>
 
-  <main class="grid">
+  <main class="grid fgrid" id="hubPage" hidden>
+    <section class="f-left" aria-label="Menu">
+      <nav class="box navbox"><h2>Menu</h2><ul class="nav navlist"></ul></nav>
+    </section>
+    <section class="f-main box" aria-label="Feed">
+      <h2><span class="wtabs" role="tablist" id="ftabs"><button type="button" class="wtab" id="ftAll" role="tab" aria-selected="true">All</button><button type="button" class="wtab" id="ftFollow" role="tab" aria-selected="false">Following</button></span><span id="fonline"></span></h2>
+      <form class="fcompose" id="fcompose" autocomplete="off">
+        <textarea id="ftext" rows="2" maxlength="500" placeholder="What's new?"></textarea>
+        <div class="frow"><span class="fhint" id="fhint"></span><button type="button" class="btn plain" id="fart">Write an article</button><button type="submit" class="btn" id="fsend">Post</button></div>
+      </form>
+      <ul class="flist" id="flist"></ul>
+      <div class="fview" id="friendsView" hidden></div>
+    </section>
+    <section class="f-chat box" aria-label="Chat room">
+      <h2>Chat room <span id="chatcount"></span></h2>
+      <ul class="clist" id="clist"></ul>
+      <form class="cform" id="cform" autocomplete="off"><input id="ctext" maxlength="500" placeholder="Say something" aria-label="Chat message"><button type="submit" class="btn" id="csend">Send</button></form>
+    </section>
+  </main>
+
+  <main class="grid" id="profilePage">
 
     <section class="a-photo" aria-label="Picture">
+      <nav class="box navbox"><h2>Menu</h2><ul class="nav navlist"></ul></nav>
       <div class="box b-pic">
         <h2>Picture <span id="followers"></span></h2>
         <div class="pad">
@@ -726,11 +840,14 @@ const NICK_DOMAIN = "users.aristocratonly.github.io";
 const NICK_RE = /^[a-z0-9_]{3,20}$/;
 const RESERVED = ["448", "admin", "owner", "status448", "root", "support", "moderator", "system", "null"];
 /* ?u=nick opens that person's page; without it, the owner's main page */
+/* Pages:  ./ the feed  |  ?friends  |  ?u=448 the owner's profile  |  ?u=nick someone's profile */
 const view = (() => {
-  const n = (new URLSearchParams(location.search).get("u") || "").toLowerCase();
-  return NICK_RE.test(n) ? { kind: "user", nick: n, id: null, missing: false } : { kind: "main", nick: "", id: null, missing: false };
+  const q = new URLSearchParams(location.search), n = (q.get("u") || "").toLowerCase();
+  const v = kind => ({ kind, nick: kind === "user" ? n : "", id: null, missing: false });
+  return n === "448" ? v("main") : NICK_RE.test(n) ? v("user") : q.has("friends") ? v("friends") : v("feed");
 })();
-const onMain = view.kind === "main";
+const onMain = view.kind === "main", onUser = view.kind === "user", onHub = view.kind === "feed" || view.kind === "friends";
+const OWNER_HREF = "?u=448";
 
 /* =====================================================================
    2. DEFAULTS. Shown until you save your own profile in edit mode,
@@ -817,8 +934,8 @@ let sb = null;                 // the Supabase client once connected
 let inlineOpen = false, renderQueued = false;
 const site = $("#site");
 
-if (!onMain) profile = normalize({ name: view.nick, fields: [], links: [] });
-if (onMain) try {
+if (onUser) profile = normalize({ name: view.nick, fields: [], links: [] });
+if (!onUser) try {
   const c = JSON.parse(localStorage.getItem("s448v2") || "null");
   if (c && c.profile) profile = normalize(c.profile);
   if (c && typeof c.avatarPath === "string") { avatarPath = c.avatarPath; avatar = avatarUrl(avatarPath); }
@@ -887,8 +1004,9 @@ function renderProfile() {
   document.title = name + " | status448";
   site.classList.toggle("editing", isOwner);
   $("#editbar").hidden = !isOwner;
-  $("#adminbar").hidden = !(isAdmin && !onMain && view.id && !view.missing);
-  renderAcct();
+  $("#adminbar").hidden = !(isAdmin && onUser && view.id && !view.missing);
+  renderAcct(); renderNav();
+  if (onHub) renderHubControls();
 
   $("#tagline").replaceChildren(editable(el("span", { textContent: p.tagline }), p.tagline, { max: LIMITS.tagline, onSave: v => profile.tagline = v, placeholder: "add a tagline" }));
   $("#infohead").textContent = name + "'s profile";
@@ -1206,10 +1324,11 @@ function addPost({ kind, icon, me, fill, ts = Date.now(), sfx = "", quiet, id })
   li.dataset.kind = kind; li.dataset.ts = ts; li.dataset.sfx = sfx; if (id) li.dataset.id = id;
   const ico = el("span", { className: "ico" + (me ? " me" : "") }); ico.setAttribute("aria-hidden", "true");
   const p = el("p"), time = el("time"), ctl = el("span");
-  li._time = time;
+  li._time = time; li._ico = ico;
   li._fill = () => {
     if (li._editing) return;
-    if (me && kind === "real" && avatar) ico.replaceChildren(el("img", { src: avatar, alt: "" }));
+    const pagePic = avatar || (onMain ? DEFAULT_PHOTO : "");
+    if (me && kind === "real") ico.replaceChildren(pagePic ? el("img", { src: pagePic, alt: "" }) : silhouette());
     else ico.textContent = me ? [...profile.name].slice(0, 3).join("") : icon;
     fill(p, ctl, li);
   };
@@ -1232,7 +1351,7 @@ const SELF_VERBS = /^(is|was|has|just|isn't|can't|will|won't)\b/i;
 const isSelfPost = r => onMain ? !r.user_id && !r.author : r.user_id === view.id;
 function authorNode(r) {
   if (r.author_key) return el("b", { textContent: r.author });                                  // guest
-  const href = r.author_nick ? "?u=" + encodeURIComponent(r.author_nick) : "./";
+  const href = r.author_nick ? "?u=" + encodeURIComponent(r.author_nick) : OWNER_HREF;
   return el("a", { className: "who", href }, el("b", { textContent: r.author || "someone" }));
 }
 function fillDb(p, ctl, li) {
@@ -1241,6 +1360,10 @@ function fillDb(p, ctl, li) {
   const text = str(r.text, LIMITS.post);
   if (isSelfPost(r)) p.replaceChildren(el("b", { textContent: profile.name }), SELF_VERBS.test(text) ? " " : "\n", text);
   else p.replaceChildren(authorNode(r), " wrote on ", el("b", { textContent: profile.name }), "'s wall:\n", text);
+  if (!isSelfPost(r) && li._ico) {                       // the writer's own photo, or the silhouette
+    const a = r.user_id ? authors.get(r.user_id) : null;
+    li._ico.replaceChildren(a && a.pic ? el("img", { src: a.pic, alt: "" }) : silhouette());
+  }
   const mine = (me && r.user_id && r.user_id === me.id) || (!r.user_id && !!r.author_key && r.author_key === guest.key);
   li.dataset.sfx = (mine && !isSelfPost(r) ? ", that's you" : "") + (r.edited_at ? ", edited" : "");
   ctl.replaceChildren();
@@ -1285,6 +1408,7 @@ function upsertPost(row, quiet) {
     : addPost({ kind: "guest", icon: ([...(row.author || "?")][0] || "?").toUpperCase(), id, ts, quiet, fill: fillDb });
   realById.set(id, li);
   li._data = row; li._fill();
+  if (row.user_id && !authors.has(row.user_id) && sb) needAuthors([row.user_id]).then(() => li._fill());
 }
 function removePost(id) {
   const li = realById.get(id);
@@ -1301,7 +1425,7 @@ function setComposer() {
     who.textContent = isOwner ? profile.name : me.name;
     input.placeholder = isOwner ? "What's on your mind?" : `write on ${profile.name}'s wall`;
     input.maxLength = LIMITS.post;
-  } else if (!onMain) {
+  } else if (onUser) {
     who.textContent = "You:"; input.placeholder = `log in to write on ${profile.name}'s wall`; input.maxLength = LIMITS.post;
   } else {
     who.textContent = guestFocus ? (guest.name ? guest.name + ":" : "You:") : profile.name + " is";
@@ -1334,7 +1458,7 @@ async function typeStatus(text) {
 }
 input.addEventListener("focus", () => {
   if (isMember()) return;
-  if (!onMain) { input.blur(); openAuth("signup"); return; }      // other walls are for accounts only
+  if (onUser) { input.blur(); openAuth("signup"); return; }       // other walls are for accounts only
   guestFocus = true; input.value = ""; setComposer();
 });
 input.addEventListener("blur", () => { if (isMember() || input.value.trim()) return; guestFocus = false; input.value = ""; setComposer(); });
@@ -1352,7 +1476,7 @@ $("#composer").addEventListener("submit", e => {
       .then(() => isOwner && say("Posted."), err => { addLocal({ icon: "!", t: "Not posted: " + guestError(err) }); if (!input.value) input.value = text; });
     return;
   }
-  if (!onMain) { openAuth("signup"); return; }
+  if (onUser) { openAuth("signup"); return; }
   if (!guestFocus) return;
   if (!sb) {                                     // no database: the old "only you can see this" note
     addPost({ kind: "local", icon: "✎", sfx: ", only you can see this", fill: p => p.replaceChildren(el("b", { textContent: "You" }), ` wrote on ${profile.name}'s wall: "${text}"`) });
@@ -1612,10 +1736,10 @@ async function loadPeople() {
   if (error) return;
   const row = (href, name, sub, pic, cls) => {
     const pa = el("span", { className: "pa" });
-    if (pic) pa.style.backgroundImage = `url("${pic}")`; else pa.textContent = ([...name][0] || "?").toUpperCase();
+    if (pic) pa.style.backgroundImage = `url("${pic}")`; else pa.classList.add("av");
     return el("li", { className: cls || "" }, el("a", { href }, pa, el("span", {}, el("b", { textContent: name }), el("small", { textContent: sub }))));
   };
-  ul.replaceChildren(row("./", "448", "the owner of this place", "", "owner"),
+  ul.replaceChildren(row(OWNER_HREF, "448", "the owner of this place", "", "owner"),
     ...data.map(u => row("?u=" + encodeURIComponent(u.nick), u.name, "@" + u.nick, avatarUrl(u.avatar_path), "")));
   if (!data.length) ul.append(el("li", { className: "artempty", textContent: "Nobody else here yet. Sign up and be the first." }));
 }
@@ -1625,10 +1749,11 @@ function openArt(id) {
   if (!a) return;
   openArtId = id;
   const body = el("div");
-  $("#artBody").replaceChildren(el("h1", { textContent: a.title }), el("p", { className: "ameta", textContent: `${profile.name}, ${fmtDate(a.createdAt)}${a.edited ? ", edited" : ""}` }), body);
+  $("#artBody").replaceChildren(el("h1", { textContent: a.title }), el("p", { className: "ameta", textContent: `${a.author || profile.name}, ${fmtDate(a.createdAt)}${a.edited ? ", edited" : ""}` }), body);
   renderMd(body, a.body);
-  $("#artOwner").hidden = !(isOwner || isAdmin);
-  $("#artEdit").hidden = !isOwner; $("#artDel").hidden = !isAdmin;
+  const mine = !!me && (a.userId ? a.userId === me.id : me.admin);
+  $("#artOwner").hidden = !(mine || isAdmin);
+  $("#artEdit").hidden = !mine; $("#artDel").hidden = !isAdmin;
   if (!$("#dlgArt").open) $("#dlgArt").showModal();
   $("#dlgArt").querySelector(".rscroll").scrollTop = 0;
   history.replaceState(null, "", "#a/" + id);
@@ -1644,7 +1769,7 @@ function setPreview(on) {
   if (on) renderMd($("#edPrevBody"), $("#edBody").value || "*Nothing written yet.*");
 }
 function openEditor(id) {
-  if (!isOwner) return;
+  if (!isOwner && !(onHub && isMember())) return;
   const a = id ? articles.find(x => x.id === id) : null;
   editId = a ? a.id : null;
   let d = null;
@@ -1667,7 +1792,7 @@ $("#artEdit").addEventListener("click", () => openEditor(openArtId));
 $("#artDel").addEventListener("click", () => {
   const id = openArtId;
   if (!sb || !id || !confirm("Delete this article for everyone?")) return;
-  sb.from("articles").delete().eq("id", id).select("id").then(must).then(() => { $("#dlgArt").close(); say("Article deleted."); }, e => say(explain(e), true));
+  sb.from("articles").delete().eq("id", id).select("id").then(must).then(() => { $("#dlgArt").close(); say("Article deleted."); }, e => addLocal({ icon: "!", t: explain(e) }));
 });
 $("#edForm").addEventListener("submit", e => {
   e.preventDefault();
@@ -1680,7 +1805,7 @@ $("#edForm").addEventListener("submit", e => {
   $("#edSave").disabled = true;
   const job = (id
     ? sb.from("articles").update({ title, body }).eq("id", id).select("id")
-    : sb.from("articles").insert(onMain ? { title, body } : { title, body, user_id: me.id }).select("id")).then(must);
+    : sb.from("articles").insert(me.admin ? { title, body } : { title, body, user_id: me.id }).select("id")).then(must);
   job.then(() => {
     if (!id) try { localStorage.removeItem(DRAFT); } catch {}
     $("#dlgEdit").close(); say(id ? "Article saved." : "Article published.");
@@ -1765,11 +1890,10 @@ function renderAcct() {
   if (!sb) { n.replaceChildren(); return; }
   if (me && (me.admin || me.nick)) {
     n.replaceChildren(
-      link(me.admin ? "448 (you)" : "@" + me.nick, me.admin ? "./" : "?u=" + encodeURIComponent(me.nick), "me"),
-      ...(onMain ? [] : [link("main page", "./")]),
+      link(me.admin ? "448 (you)" : "@" + me.nick, me.admin ? OWNER_HREF : "?u=" + encodeURIComponent(me.nick), "me"),
       btn("log out", () => sb.auth.signOut()));
   } else {
-    n.replaceChildren(...(onMain ? [] : [link("main page", "./")]), btn("log in", () => openAuth("login")), btn("sign up", () => openAuth("signup")));
+    n.replaceChildren(btn("log in", () => openAuth("login")), btn("sign up", () => openAuth("signup")));
   }
 }
 
@@ -1805,6 +1929,355 @@ function checkOlder() {
     }, () => { loadingOlder = false; });
 }
 feed.addEventListener("scroll", checkOlder, { passive: true });
+
+/* =====================================================================
+   PEOPLE, AVATARS, MENU (every page)
+   ===================================================================== */
+const SVGNS = "http://www.w3.org/2000/svg";
+function silhouette() {
+  const svg = document.createElementNS(SVGNS, "svg"); svg.setAttribute("viewBox", "0 0 100 100"); svg.setAttribute("aria-hidden", "true");
+  const bg = document.createElementNS(SVGNS, "rect"); bg.setAttribute("width", "100"); bg.setAttribute("height", "100"); bg.setAttribute("fill", "#f3e7e4");
+  const c = document.createElementNS(SVGNS, "circle"); c.setAttribute("cx", "50"); c.setAttribute("cy", "40"); c.setAttribute("r", "20"); c.setAttribute("fill", "#c9a5a2");
+  const p = document.createElementNS(SVGNS, "path"); p.setAttribute("d", "M12 100c2-24 18-34 38-34s36 10 38 34z"); p.setAttribute("fill", "#c9a5a2");
+  svg.append(bg, c, p); return svg;
+}
+/* who wrote what: id -> { name, nick, pic }. The owner's nick is "448". */
+const authors = new Map();
+async function needAuthors(ids) {
+  if (!sb) return;
+  const want = [...new Set(ids.map(i => i || OWNER_ID))].filter(id => !authors.has(id));
+  if (!want.length) return;
+  const others = want.filter(id => id !== OWNER_ID);
+  await Promise.all([
+    want.includes(OWNER_ID) && sb.from("profile").select("name,avatar_path").eq("id", 1).maybeSingle().then(({ data }) =>
+      authors.set(OWNER_ID, { name: (data && data.name) || "448", nick: "448", pic: (data && avatarUrl(data.avatar_path)) || DEFAULT_PHOTO })),
+    others.length && sb.from("users_profile").select("id,nick,name,avatar_path").in("id", others).then(({ data }) =>
+      (data || []).forEach(u => authors.set(u.id, { name: u.name, nick: u.nick, pic: avatarUrl(u.avatar_path) })))
+  ]);
+  want.forEach(id => { if (!authors.has(id)) authors.set(id, { name: "deleted account", nick: "", pic: "" }); });
+}
+const authorOf = id => authors.get(id || OWNER_ID) || { name: "…", nick: "", pic: "" };
+const pageHref = a => a.nick === "448" ? OWNER_HREF : a.nick ? "?u=" + encodeURIComponent(a.nick) : "#";
+function avatarEl(a, small) {
+  const s = el("span", { className: "av" + (small ? " sm" : "") });
+  if (a.pic) { s.style.backgroundImage = `url("${a.pic}")`; if (a.pic === DEFAULT_PHOTO) s.style.backgroundPosition = "61% 22%"; }
+  return s;
+}
+const whenEl = ms => { const t = el("span", { className: "when" }); t.dataset.at = ms; t.textContent = ago(Math.max(0, (Date.now() - ms) / 1000)); return t; };
+setInterval(() => document.querySelectorAll("[data-at]").forEach(t => t.textContent = ago(Math.max(0, (Date.now() - t.dataset.at) / 1000))), 15000);
+
+/* the menu on the left */
+function renderNav() {
+  const mine = me && (me.admin ? OWNER_HREF : me.nick ? "?u=" + encodeURIComponent(me.nick) : "");
+  const onMine = me && ((me.admin && onMain) || (!me.admin && onUser && view.nick === me.nick));
+  const item = (icon, label, href, on, extra) => {
+    const kids = [el("span", { className: "ni", textContent: icon, ariaHidden: "true" }), label];
+    const n = href ? el("a", { href, className: on ? "on" : "" }, ...kids) : el("button", { type: "button", className: on ? "on" : "" }, ...kids);
+    if (extra) extra(n);
+    return el("li", { className: n.classList.contains("mchat") ? "mchat" : "" }, n);
+  };
+  const lists = document.querySelectorAll(".navlist");
+  lists.forEach(ul => ul.replaceChildren(
+    item("☺", me ? "My account" : "Log in", mine || null, onMine, n => { if (!mine) n.onclick = () => openAuth("login"); }),
+    item("♥", "My friends", "?friends", view.kind === "friends"),
+    item("≡", "Feed", "./", view.kind === "feed"),
+    ...(onHub ? [item("✉", "Chat", null, false, n => { n.classList.add("mchat"); n.onclick = () => $("#hubPage").classList.toggle("chat"); })] : [])));
+}
+
+/* =====================================================================
+   THE FEED, FRIENDS AND THE CHAT ROOM (./ and ?friends)
+   ===================================================================== */
+let feedTab = "all", feedOldest = null, feedMore = false, feedLoading = false, followedIds = null;
+const feedById = new Map(), commentCounts = new Map(), openComments = new Map();   // openComments: target id -> list element
+const FEED_COLS = "kind,id,author_id,title,body,created_at,edited";
+const flist = $("#flist");
+
+function renderHubControls() {
+  const m = isMember();
+  $("#ftext").placeholder = m ? `What's new, ${me.name}?` : "Log in or sign up to post";
+  $("#fart").hidden = !m;
+  $("#fhint").textContent = m ? "" : "";
+  $("#ctext").placeholder = m ? "Say something" : "Log in to chat";
+  $("#fcompose").hidden = view.kind !== "feed";
+}
+const needAccount = e => { if (isMember()) return false; if (e) { e.preventDefault(); e.target.blur(); } openAuth("signup"); return true; };
+$("#ftext").addEventListener("focus", e => needAccount(e));
+$("#ctext").addEventListener("focus", e => needAccount(e));
+$("#fart").addEventListener("click", () => { if (!needAccount()) openEditor(null); });
+
+$("#fcompose").addEventListener("submit", e => {
+  e.preventDefault();
+  if (needAccount()) return;
+  const text = $("#ftext").value.trim();
+  if (!text) return;
+  if (window.runEgg && runEgg(text)) { $("#ftext").value = ""; return; }
+  const row = me.admin ? { text: text.slice(0, LIMITS.post) } : { text: text.slice(0, LIMITS.post), wall: me.id, user_id: me.id };
+  $("#fsend").disabled = true;
+  sb.from("posts").insert(row).select("id").then(must).then(() => { $("#ftext").value = ""; },
+    err => $("#fhint").textContent = "Not posted: " + guestError(err)).finally(() => $("#fsend").disabled = false);
+});
+$("#ftext").addEventListener("keydown", e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) $("#fcompose").requestSubmit(); });
+
+function setFeedTab(t) {
+  feedTab = t;
+  $("#ftAll").setAttribute("aria-selected", t === "all"); $("#ftFollow").setAttribute("aria-selected", t === "follow");
+  loadFeed(true);
+}
+$("#ftAll").addEventListener("click", () => setFeedTab("all"));
+$("#ftFollow").addEventListener("click", () => setFeedTab("follow"));
+
+function feedEmpty(text, action) {
+  flist.replaceChildren(el("li", { className: "fempty" }, text, ...(action ? [" ", el("button", { type: "button", textContent: action[0], onclick: action[1] })] : [])));
+}
+async function myFollowees() {
+  if (!me) return [];
+  const { data } = await sb.from("follows").select("followee").eq("follower", me.id);
+  return (data || []).map(r => r.followee);
+}
+function feedQuery() {
+  let q = sb.from("feed").select(FEED_COLS).order("created_at", { ascending: false }).limit(20);
+  if (feedTab !== "follow") return q;
+  const ids = [...followedIds, me.admin ? null : me.id].filter(x => x && x !== OWNER_ID);
+  const withOwner = me.admin || followedIds.includes(OWNER_ID);
+  const parts = [];
+  if (ids.length) parts.push(`author_id.in.(${ids.join(",")})`);
+  if (withOwner) parts.push("author_id.is.null");
+  return parts.length ? q.or(parts.join(",")) : null;
+}
+const inFollowTab = authorId => feedTab !== "follow" || !followedIds ||
+  (authorId ? authorId === (me && me.id) || followedIds.includes(authorId) : (me && me.admin) || followedIds.includes(OWNER_ID));
+async function loadFeed(reset) {
+  if (!sb || view.kind !== "feed") return;
+  if (reset) { feedOldest = null; feedMore = false; feedById.clear(); openComments.clear(); flist.replaceChildren(); flist.scrollTop = 0; }
+  if (feedTab === "follow") {
+    if (!me) return feedEmpty("Log in to see posts from people you follow.", ["Log in", () => openAuth("login")]);
+    if (followedIds === null) followedIds = await myFollowees();
+  }
+  let q = feedQuery();
+  if (!q) return feedEmpty("You don't follow anyone yet. Open someone's page and press Follow.");
+  if (feedOldest) q = q.lt("created_at", feedOldest);
+  feedLoading = true;
+  const { data, error } = await q;
+  feedLoading = false;
+  if (error) return;
+  await Promise.all([needAuthors(data.map(r => r.author_id)), loadCommentCounts(data.map(r => r.id))]);
+  data.forEach(r => { if (!feedById.has(r.id)) flist.append(feedItem(r)); });
+  if (data.length) feedOldest = data[data.length - 1].created_at;
+  feedMore = data.length === 20;
+  if (!feedById.size) feedEmpty("Nothing here yet. Write the first post.");
+  checkFeedMore();
+}
+function checkFeedMore() {
+  if (feedMore && !feedLoading && flist.scrollTop + flist.clientHeight >= flist.scrollHeight - 150) loadFeed(false);
+}
+flist.addEventListener("scroll", checkFeedMore, { passive: true });
+
+async function loadCommentCounts(ids) {
+  if (!ids.length) return;
+  const { data } = await sb.from("comments").select("target_id").in("target_id", ids);
+  ids.forEach(id => commentCounts.set(id, 0));
+  (data || []).forEach(c => commentCounts.set(c.target_id, (commentCounts.get(c.target_id) || 0) + 1));
+}
+const canEditFeed = r => !!me && (r.author_id ? r.author_id === me.id : me.admin);
+
+function feedItem(r) {
+  const a = authorOf(r.author_id), ts = Date.parse(r.created_at) || Date.now();
+  const li = el("li", { className: "fitem" });
+  li.dataset.id = r.id; li._row = r;
+  const body = el("div", { className: "fbody" });
+  const head = el("div", { className: "fhead" }, el("a", { href: pageHref(a), textContent: a.name }),
+    r.kind === "article" ? " published an article" : "", whenEl(ts), r.edited ? el("span", { className: "when", textContent: "edited" }) : "");
+  const content = r.kind === "article"
+    ? el("button", { type: "button", className: "fart", onclick: () => openFeedArticle(r.id) },
+        el("b", { textContent: r.title }), el("p", { textContent: excerpt(r.body) }), el("small", { textContent: "Read the article" }))
+    : el("p", { className: "ftext", textContent: r.body });
+  const ctl = el("div", { className: "fctl" });
+  const com = el("div", { className: "fcom" }); com.hidden = true;
+  const n = commentCounts.get(r.id) || 0;
+  const cbtn = el("button", { type: "button", textContent: n ? `Comments (${n})` : "Comment", onclick: () => toggleComments(li) });
+  li._cbtn = cbtn; li._com = com;
+  ctl.append(cbtn);
+  if (canEditFeed(r)) ctl.append(el("button", { type: "button", textContent: "edit", onclick: () => r.kind === "article" ? openFeedArticle(r.id, true) : editFeedPost(li) }));
+  if (isAdmin) ctl.append(el("button", { type: "button", className: "del", textContent: "delete", onclick: () => {
+    if (!confirm(`Delete this ${r.kind} for everyone?`)) return;
+    sb.from(r.kind === "article" ? "articles" : "posts").delete().eq("id", r.id).select("id").then(must)
+      .then(() => removeFeedItem(r.id), err => alert(explain(err)));
+  } }));
+  body.append(head, content, ctl, com);
+  li._content = content;
+  li.append(el("a", { href: pageHref(a), title: a.name }, avatarEl(a)), body);
+  feedById.set(r.id, li);
+  return li;
+}
+function removeFeedItem(id) { const li = feedById.get(id); if (li) { li.remove(); feedById.delete(id); } openComments.delete(id); }
+function setCommentCount(id, n) {
+  commentCounts.set(id, n);
+  const li = feedById.get(id);
+  if (li) li._cbtn.textContent = li._com.hidden ? (n ? `Comments (${n})` : "Comment") : "Hide comments";
+}
+function editFeedPost(li) {
+  if (li._editing) return;
+  li._editing = true;
+  const old = li._row.body, ta = el("textarea", { value: old, rows: 3, maxLength: LIMITS.post });
+  const done = () => { form.replaceWith(li._content); li._editing = false; };
+  const form = el("form", { className: "pedit2" }, ta, el("div", {}, el("button", { type: "submit", className: "btn", textContent: "Save" }),
+    el("button", { type: "button", className: "btn plain", textContent: "Cancel", onclick: done })));
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const text = ta.value.trim();
+    if (!text) return ta.focus();
+    if (text !== old) sb.from("posts").update({ text }).eq("id", li._row.id).select("id").then(must).catch(err => alert(explain(err)));
+    done();
+  });
+  li._content.replaceWith(form); ta.focus();
+}
+/* the full article (the feed only carries the first lines) opens in the reader */
+async function openFeedArticle(id, edit) {
+  const { data } = await sb.from("articles").select("id,title,body,created_at,updated_at,user_id").eq("id", id).maybeSingle();
+  if (!data) return;
+  await needAuthors([data.user_id]);
+  const c = Date.parse(data.created_at), u = Date.parse(data.updated_at) || c;
+  const a = { id: data.id, title: data.title, body: data.body, createdAt: c, edited: u - c > 60000, userId: data.user_id || null, author: authorOf(data.user_id).name };
+  articles = articles.filter(x => x.id !== id).concat(a);
+  edit ? openEditor(id) : openArt(id);
+}
+
+/* ---------- comments ---------- */
+async function toggleComments(li) {
+  const id = li.dataset.id, com = li._com;
+  if (!com.hidden) { com.hidden = true; openComments.delete(id); setCommentCount(id, commentCounts.get(id) || 0); return; }
+  com.hidden = false; li._cbtn.textContent = "Hide comments";
+  const list = el("div");
+  const form = el("form", { className: "cinput", autocomplete: "off" },
+    el("input", { maxLength: 1000, placeholder: isMember() ? "Write a comment" : "Log in to comment", ariaLabel: "Comment" }),
+    el("button", { type: "submit", className: "btn", textContent: "Send" }));
+  const inp = form.firstChild;
+  inp.addEventListener("focus", e => needAccount(e));
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    if (needAccount()) return;
+    const text = inp.value.trim();
+    if (!text) return;
+    form.lastChild.disabled = true;
+    sb.from("comments").insert({ target_kind: li._row.kind, target_id: id, user_id: me.id, text }).select("id").then(must)
+      .then(() => { inp.value = ""; }, err => alert("Not sent: " + guestError(err))).finally(() => form.lastChild.disabled = false);
+  });
+  com.replaceChildren(list, form);
+  openComments.set(id, list);
+  const { data } = await sb.from("comments").select("id,user_id,text,created_at,edited_at").eq("target_id", id).order("created_at").limit(300);
+  await needAuthors((data || []).map(c => c.user_id));
+  list.replaceChildren(...(data || []).map(commentEl));
+}
+function commentEl(c) {
+  const a = authorOf(c.user_id);
+  const row = el("div", { className: "citem" });
+  row.dataset.id = c.id;
+  const text = el("span", { className: "ct", textContent: c.text });
+  const ctl = el("div", { className: "fctl" });
+  if (me && c.user_id === me.id) ctl.append(el("button", { type: "button", textContent: "edit", onclick: () => {
+    const t = prompt("Edit your comment", c.text);
+    if (t && t.trim() && t.trim() !== c.text) sb.from("comments").update({ text: t.trim().slice(0, 1000) }).eq("id", c.id).select("id").then(must).catch(err => alert(explain(err)));
+  } }));
+  if (isAdmin) ctl.append(el("button", { type: "button", className: "del", textContent: "delete", onclick: () => {
+    if (confirm("Delete this comment?")) sb.from("comments").delete().eq("id", c.id).select("id").then(must).catch(err => alert(explain(err)));
+  } }));
+  row.append(el("a", { href: pageHref(a), title: a.name }, avatarEl(a, true)),
+    el("div", { className: "cb" }, el("a", { href: pageHref(a), textContent: a.name }), whenEl(Date.parse(c.created_at)),
+      c.edited_at ? el("span", { className: "when", textContent: "edited" }) : "", el("br"), text, ctl));
+  return row;
+}
+
+/* ---------- the chat room ---------- */
+const clist = $("#clist");
+const nearBottom = () => clist.scrollTop + clist.clientHeight >= clist.scrollHeight - 60;
+function chatEl(m) {
+  const a = authorOf(m.user_id);
+  const li = el("li", { className: "cmsg" });
+  li.dataset.id = m.id;
+  li.append(el("a", { href: pageHref(a), title: a.name }, avatarEl(a, true)),
+    el("div", { className: "cb" }, el("a", { href: pageHref(a), textContent: a.name }), whenEl(Date.parse(m.created_at)), el("span", { className: "ct", textContent: m.text })));
+  if (isAdmin) li.append(el("button", { type: "button", className: "x", title: "Delete", textContent: "×", onclick: () =>
+    sb.from("chat_messages").delete().eq("id", m.id).select("id").then(must).catch(err => alert(explain(err))) }));
+  return li;
+}
+async function loadChat() {
+  if (!sb) return;
+  const { data, error } = await sb.from("chat_messages").select("id,user_id,text,created_at").order("id", { ascending: false }).limit(100);
+  if (error) return;
+  await needAuthors(data.map(m => m.user_id));
+  clist.replaceChildren(...data.reverse().map(chatEl));
+  if (!data.length) clist.append(el("li", { className: "fempty", textContent: "Quiet in here. Say hi." }));
+  clist.scrollTop = clist.scrollHeight;
+}
+async function addChat(m) {
+  await needAuthors([m.user_id]);
+  const stick = nearBottom();
+  clist.querySelector(".fempty")?.remove();
+  clist.append(chatEl(m));
+  while (clist.children.length > 200) clist.firstChild.remove();
+  if (stick || (me && m.user_id === me.id)) clist.scrollTop = clist.scrollHeight;
+}
+$("#cform").addEventListener("submit", e => {
+  e.preventDefault();
+  if (needAccount()) return;
+  const text = $("#ctext").value.trim();
+  if (!text) return;
+  $("#csend").disabled = true;
+  sb.from("chat_messages").insert({ user_id: me.id, text: text.slice(0, 500) }).select("id").then(must)
+    .then(() => { $("#ctext").value = ""; }, err => alert("Not sent: " + guestError(err))).finally(() => $("#csend").disabled = false);
+});
+
+/* ---------- friends: mutual follows, plus who I follow and who follows me ---------- */
+async function loadFriends() {
+  const box = $("#friendsView");
+  if (!sb) return;
+  if (!me) { box.replaceChildren(el("p", { className: "fempty" }, "Log in to see your friends. ", el("button", { type: "button", textContent: "Log in", onclick: () => openAuth("login") }))); return; }
+  const [a, b] = await Promise.all([
+    sb.from("follows").select("followee").eq("follower", me.id),
+    sb.from("follows").select("follower").eq("followee", me.id)]);
+  const following = (a.data || []).map(r => r.followee), followers = (b.data || []).map(r => r.follower);
+  const friends = following.filter(id => followers.includes(id));
+  await needAuthors([...following, ...followers]);
+  const section = (title, ids, empty) => el("section", { className: "fsec" },
+    el("h3", {}, title + " ", el("span", { textContent: ids.length })),
+    el("ul", { className: "plist" }, ...(ids.length ? ids.map(id => {
+      const p = authorOf(id);
+      return el("li", {}, el("a", { href: pageHref(p) }, avatarEl(p), el("span", {}, el("b", { textContent: p.name }), el("small", { textContent: p.nick === "448" ? "the owner" : "@" + p.nick }))));
+    }) : [el("li", { className: "fempty", textContent: empty })])));
+  box.replaceChildren(
+    section("Friends", friends, "No friends yet. A friend is someone you follow who follows you back."),
+    section("Following", following, "You don't follow anyone yet."),
+    section("Followers", followers, "Nobody follows you yet."));
+}
+
+/* the realtime wiring of the hub */
+function startHub() {
+  $("#profilePage").hidden = true; $("#hubPage").hidden = false;
+  $("#hubPage .f-left").append($("#player"));                 // the music player moves into the menu column
+  $("#flist").hidden = view.kind !== "feed"; $("#friendsView").hidden = view.kind !== "friends";
+  $("#ftabs").hidden = view.kind !== "feed";
+  if (view.kind === "friends") $("#ftabs").before(el("span", { textContent: "My friends", style: "color:#fff;font-weight:700" }));
+  renderNav(); renderHubControls();
+}
+if (onHub) startHub();
+
+async function hubFeedChange(p) {
+  const table = p.table, row = p.new && Object.keys(p.new).length ? p.new : null, id = (row || p.old || {}).id;
+  if (p.eventType === "DELETE") { removeFeedItem(id); return; }
+  const isFeed = table === "articles" || (row && row.in_feed);
+  if (!isFeed) return;
+  const r = table === "articles"
+    ? { kind: "article", id: row.id, author_id: row.user_id || null, title: row.title, body: str(row.body, 400), created_at: row.created_at, edited: Date.parse(row.updated_at) - Date.parse(row.created_at) > 60000 }
+    : { kind: "post", id: row.id, author_id: row.user_id || null, title: null, body: row.text, created_at: row.created_at, edited: !!row.edited_at };
+  if (!inFollowTab(r.author_id) || view.kind !== "feed") return;
+  await needAuthors([r.author_id]);
+  const old = feedById.get(r.id);
+  const li = feedItem(r);
+  if (old) { old.replaceWith(li); if (!old._com.hidden) toggleComments(li); return; }
+  if (p.eventType !== "INSERT") return;
+  flist.querySelector(".fempty")?.remove();
+  li.classList.add("new"); flist.prepend(li);
+}
 
 /* =====================================================================
    SUPABASE: live profile, posts, articles (Realtime), "now on page" (Presence)
@@ -1851,6 +2324,7 @@ async function connect() {
       await setMe(session); roles();
       if (isOwner && !was) { input.value = ""; guestFocus = false; say("You're in."); }
       renderProfile(); reloadFollow();
+      if (onHub && sb) { followedIds = null; view.kind === "feed" ? loadFeed(true) : loadFriends(); loadChat(); }
     });
   });
 
@@ -1862,8 +2336,44 @@ async function connect() {
     cache(); renderProfile();
   };
 
+  /* the feed and the friends page */
+  if (onHub) {
+    sb.from("profile").select("*").eq("id", 1).maybeSingle().then(({ data }) => applyProfile(data));
+    sb.channel("hub")
+      .on("postgres_changes", { event: "*", schema: "public", table: "posts" }, hubFeedChange)
+      .on("postgres_changes", { event: "*", schema: "public", table: "articles" }, hubFeedChange)
+      .on("postgres_changes", { event: "*", schema: "public", table: "comments" }, async p => {
+        const c = p.eventType === "DELETE" ? p.old : p.new, list = c && openComments.get(c.target_id);
+        if (p.eventType === "DELETE") {                 // only the id arrives: find the comment on screen
+          const row = c && document.querySelector(`.citem[data-id="${c.id}"]`), item = row && row.closest(".fitem");
+          if (row) row.remove();
+          if (item) setCommentCount(item.dataset.id, Math.max(0, (commentCounts.get(item.dataset.id) || 1) - 1));
+          return;
+        }
+        if (p.eventType === "INSERT") setCommentCount(c.target_id, (commentCounts.get(c.target_id) || 0) + 1);
+        if (!list) return;
+        await needAuthors([c.user_id]);
+        const old = list.querySelector(`.citem[data-id="${c.id}"]`);
+        old ? old.replaceWith(commentEl(c)) : list.append(commentEl(c));
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "chat_messages" }, p => {
+        if (p.eventType === "INSERT") addChat(p.new);
+        if (p.eventType === "DELETE" && p.old) clist.querySelector(`.cmsg[data-id="${p.old.id}"]`)?.remove();
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "follows" }, () => {
+        followedIds = null;
+        if (view.kind === "friends") loadFriends();
+      })
+      .subscribe();
+    view.kind === "feed" ? loadFeed(true) : loadFriends();
+    loadChat();
+    renderAcct();
+    startPresence();
+    return;
+  }
+
   /* someone's page: find the person first, everything else hangs on their id */
-  if (!onMain) {
+  if (onUser) {
     const { data } = await sb.from("users_profile").select("*").eq("nick", view.nick).maybeSingle();
     if (!data) {
       view.missing = true;
@@ -1878,12 +2388,12 @@ async function connect() {
   }
 
   const loadArticles = async () => {
-    const q = sb.from("articles").select("id,title,body,created_at,updated_at");
+    const q = sb.from("articles").select("id,title,body,created_at,updated_at,user_id");
     const { data, error } = await (onMain ? q.is("user_id", null) : q.eq("user_id", view.id)).order("created_at", { ascending: false });
     if (error) return;
     articles = data.map(x => {
       const c = Date.parse(x.created_at) || Date.now(), u = Date.parse(x.updated_at) || c;
-      return { id: x.id, title: str(x.title, ART_LIMITS.title), body: str(x.body, ART_LIMITS.body), createdAt: c, edited: u - c > 60000 };
+      return { id: x.id, title: str(x.title, ART_LIMITS.title), body: str(x.body, ART_LIMITS.body), createdAt: c, edited: u - c > 60000, userId: x.user_id || null };
     }).filter(a => a.title);
     renderArts();
     if (openArtId && !$("#dlgEdit").open) { if (articles.some(a => a.id === openArtId)) openArt(openArtId); else $("#dlgArt").close(); }
@@ -1926,9 +2436,15 @@ async function connect() {
 
   /* "now on page": Realtime Presence, nothing is written to the database */
   renderAcct();
-  const room = sb.channel(onMain ? "online" : "online:" + view.id, { config: { presence: { key: crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) } } });
+  startPresence();
+}
+
+/* "now on page": Realtime Presence, nothing is written to the database */
+function startPresence() {
+  const room = sb.channel(onMain ? "online" : onUser ? "online:" + view.id : "online:hub", { config: { presence: { key: crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) } } });
   room.on("presence", { event: "sync" }, () => {
-    $("#online").textContent = "now on page: " + Math.max(1, Object.keys(room.presenceState()).length);
+    const n = "now here: " + Math.max(1, Object.keys(room.presenceState()).length);
+    $("#online").textContent = n; $("#fonline").textContent = n;
   }).subscribe(status => { if (status === "SUBSCRIBED") room.track({ at: Date.now() }); });
 }
 
