@@ -392,17 +392,32 @@ dt .inl input{width:70px}
 .pedit2 textarea{width:100%;resize:vertical;font:inherit;border:1px solid #b79f9b;padding:4px 6px}
 .pedit2 div{display:flex;gap:6px}
 
-/* chat room */
-.clist{padding:4px 0}
-.cmsg{display:flex;gap:7px;padding:4px 8px}
-.cmsg .cb{flex:1;min-width:0;font-size:11px;line-height:1.35}
-.cmsg .cb a{font-weight:700;color:var(--link)}
+/* chat room: mine on the right, everyone else on the left; runs of one person are grouped */
+.clist{padding:8px 0}
+.cmsg{display:flex;gap:7px;align-items:flex-end;padding:1px 10px}
+.cmsg:not(.cont){margin-top:7px}
+.cmsg .avl{flex:none;line-height:0}
+.cmsg .cb{max-width:78%;min-width:0;background:#fff;border:1px solid var(--line);padding:5px 9px 6px;font-size:12px;line-height:1.4}
+.cmsg .cn{display:block;font-size:10px;margin-bottom:1px;color:var(--muted)}
+.cmsg .cn a{font-weight:700;color:var(--link)}
 .cmsg .ct{display:block;white-space:pre-wrap;overflow-wrap:anywhere}
-.cmsg .x{flex:none;align-self:flex-start;font:12px/1 var(--sans);color:var(--muted);background:none;border:0;cursor:pointer;opacity:0;padding:0 2px}
-.cmsg:hover .x{opacity:1}
+.cmsg.cont .avl{visibility:hidden}
+.cmsg.cont .cn{display:none}
+.cmsg.mine{flex-direction:row-reverse}
+.cmsg.mine .cb{background:var(--tint);border-color:#dcc3bf}
+.cmsg.mine .cn a{color:var(--crimson)}
+.cmsg .x{flex:none;align-self:center;font:13px/1 var(--sans);color:var(--muted);background:none;border:0;cursor:pointer;opacity:0;padding:0 3px}
+.cmsg:hover .x,.cmsg .x:focus-visible{opacity:1}
 .cmsg .x:hover{color:#a3242f}
-.cform{flex:none;display:flex;gap:5px;padding:6px 8px;background:var(--tint);border-top:1px solid var(--line)}
-.cform input{flex:1;min-width:0;font:inherit;color:var(--ink);background:#fff;border:1px solid #b79f9b;padding:3px 5px;border-radius:0}
+.csys{padding:5px 14px;text-align:center;color:var(--muted);font-size:11px;font-style:italic}
+.csys b{color:var(--link);font-style:normal}
+.cmore{padding:6px;text-align:center;color:var(--muted);font-size:10px}
+.cform{flex:none;display:flex;gap:6px;padding:7px 8px;background:var(--tint);border-top:1px solid var(--line)}
+.cform input{flex:1;min-width:0;font:inherit;color:var(--ink);background:#fff;border:1px solid #b79f9b;padding:4px 7px;border-radius:0}
+.cform input:focus{outline:none;border-color:var(--crimson);box-shadow:0 0 0 3px rgba(122,28,38,.12)}
+.cguest{flex:none;padding:9px 10px;background:var(--tint);border-top:1px solid var(--line);font-size:11px;color:var(--muted);text-align:center}
+.cguest button{font:inherit;font-weight:700;color:var(--link);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+.a-wall .clist{flex:1;min-height:0}
 
 /* friends */
 .fview{flex:1;min-height:0;overflow-y:auto}
@@ -654,7 +669,8 @@ html.ip.show .site{opacity:1;transform:none;transition:opacity .9s ease,transfor
     <section class="f-chat box" aria-label="Chat room" hidden>
       <h2>Chat room <span id="chatcount"></span></h2>
       <ul class="clist" id="clist"></ul>
-      <form class="cform" id="cform" autocomplete="off"><input id="ctext" maxlength="500" placeholder="Say something" aria-label="Chat message"><button type="submit" class="btn" id="csend">Send</button></form>
+      <form class="cform" id="cform" autocomplete="off"><input id="ctext" maxlength="500" placeholder="Message everyone" aria-label="Chat message" enterkeyhint="send"><button type="submit" class="btn" id="csend">Send</button></form>
+      <div class="cguest" id="cguest" hidden>Everyone with an account can chat here. <button type="button" id="cgLogin">Log in</button> or <button type="button" id="cgSignup">sign up</button> to join in.</div>
     </section>
   </main>
 
@@ -708,7 +724,7 @@ html.ip.show .site{opacity:1;transform:none;transition:opacity .9s ease,transfor
 
     <section class="a-wall" aria-label="Wall">
       <div class="box">
-        <h2><span class="wtabs" role="tablist"><button type="button" class="wtab" id="tabWall" role="tab" aria-selected="true">The Wall</button><button type="button" class="wtab" id="tabArts" role="tab" aria-selected="false">Articles<span id="acount"></span></button><button type="button" class="wtab" id="tabPeople" role="tab" aria-selected="false">People</button></span> <span id="online">live</span></h2>
+        <h2><span class="wtabs" role="tablist"><button type="button" class="wtab" id="tabWall" role="tab" aria-selected="true">Chat</button><button type="button" class="wtab" id="tabArts" role="tab" aria-selected="false">Articles<span id="acount"></span></button><button type="button" class="wtab" id="tabPeople" role="tab" aria-selected="false">People</button></span> <span id="online">live</span></h2>
         <form class="composer" id="composer" autocomplete="off">
           <label for="status" id="who"></label>
           <input id="status" type="text" maxlength="90">
@@ -1071,7 +1087,8 @@ function renderProfile() {
 
   /* misc */
   $("#conn").textContent = isOwner ? `You are ${name}. Hello, you.` : following ? `You follow ${name}.` : `You are a stranger to ${name}.`;
-  $("#composer").hidden = view.missing || $("#feed").hidden;
+  if (!onHub) { $("#composer").hidden = true; $("#feed").hidden = true; }
+  renderChatControls();
   $("#track").replaceChildren(editable(el("span", { textContent: p.track }), p.track, { max: LIMITS.track, onSave: v => profile.track = v, placeholder: "name this track" }));
   setComposer();
   refreshPosts();
@@ -1339,7 +1356,8 @@ function addPost({ kind, icon, me, fill, ts = Date.now(), sfx = "", quiet, id })
   return li;
 }
 const addFake = (o, extra = {}) => addPost({ kind: "fake", icon: o.icon, me: o.me, sfx: ", allegedly", fill: p => p.replaceChildren(...rich(o.t)), ...extra });
-const addLocal = (o, extra = {}) => addPost({ kind: "local", icon: o.icon, me: o.me, fill: p => p.replaceChildren(...rich(o.t)), ...extra });
+const addLocal = (o, extra = {}) => $("#feed").hidden ? chatNote(rich(o.t))
+  : addPost({ kind: "local", icon: o.icon, me: o.me, fill: p => p.replaceChildren(...rich(o.t)), ...extra });
 
 /* ---------- posts from the database ----------
    Every row is one of: the wall's own person writing ("self"), a guest
@@ -1579,10 +1597,10 @@ function copyBadge() {
     () => addLocal({ icon: "★", t: "Copy this onto your site: " + code.replace(/[*{}]/g, "") }));
 }
 function showBadge() {
-  addPost({ kind: "local", icon: "★", fill: p => p.replaceChildren(
+  chatNote([el("span", {}, 
     "You found ", el("b", { textContent: profile.name }), "'s 88x31 button. Click it to copy the code for your site.",
     el("button", { type: "button", className: "badge", title: "Copy the code", onclick: copyBadge },
-      el("img", { src: "button-88x31.png", width: 88, height: 31, alt: "status448 88x31 button" }))) });
+      el("img", { src: "button-88x31.png", width: 88, height: 31, alt: "status448 88x31 button" })))]);
 }
 
 /* ---------- poke + add friend (local fun) ---------- */
@@ -1713,13 +1731,16 @@ function renderArts() {
       el("b", { textContent: a.title }), el("small", { textContent: fmtDate(a.createdAt) + (a.edited ? ", edited" : "") }), el("p", { textContent: excerpt(a.body) }))));
 }
 /* the three tabs of the wall box: "wall", "arts", "people" (true/false still mean arts/wall) */
+let curTab = "wall";
 function showTab(which) {
   const t = which === true ? "arts" : which === false ? "wall" : which;
   $("#tabWall").setAttribute("aria-selected", t === "wall"); $("#tabArts").setAttribute("aria-selected", t === "arts");
   $("#tabPeople").setAttribute("aria-selected", t === "people");
-  $("#feed").hidden = t !== "wall"; $("#composer").hidden = t !== "wall" || view.missing;
+  curTab = t;
+  $("#feed").hidden = true; $("#composer").hidden = true;            // the old wall is replaced by the chat room
+  $("#clist").hidden = t !== "wall"; renderChatControls();
   $("#arts").hidden = t !== "arts"; $("#people").hidden = t !== "people";
-  if (t === "wall") trim();
+  if (t === "wall") clist.scrollTop = clist.scrollHeight;
   if (t === "people") loadPeople();
 }
 $("#tabWall").addEventListener("click", () => showTab("wall"));
@@ -1995,7 +2016,6 @@ function renderHubControls() {
   $("#ftext").placeholder = m ? `What's new, ${me.name}?` : "Log in or sign up to post";
   $("#fart").hidden = !m;
   $("#fhint").textContent = m ? "" : "";
-  $("#ctext").placeholder = m ? "Say something" : "Log in to chat";
   $("#fcompose").hidden = view.kind !== "feed";
 }
 const needAccount = e => { if (isMember()) return false; if (e) { e.preventDefault(); e.target.blur(); } openAuth("signup"); return true; };
@@ -2009,7 +2029,7 @@ $("#fcompose").addEventListener("submit", e => {
   const text = $("#ftext").value.trim();
   if (!text) return;
   if (window.runEgg && runEgg(text)) { $("#ftext").value = ""; return; }
-  const row = me.admin ? { text: text.slice(0, LIMITS.post) } : { text: text.slice(0, LIMITS.post), wall: me.id, user_id: me.id };
+  const row = me.admin ? { text: text.slice(0, LIMITS.post), from_feed: true } : { text: text.slice(0, LIMITS.post), wall: me.id, user_id: me.id, from_feed: true };
   $("#fsend").disabled = true;
   sb.from("posts").insert(row).select("id").then(must).then(() => { $("#ftext").value = ""; },
     err => $("#fhint").textContent = "Not posted: " + guestError(err)).finally(() => $("#fsend").disabled = false);
@@ -2185,45 +2205,86 @@ function commentEl(c) {
   return row;
 }
 
-/* ---------- the chat room ---------- */
+/* ---------- the chat room (the Chat page and the first tab of every profile) ---------- */
 const clist = $("#clist");
+let chatMsgs = [], chatOlder = false, chatLoading = false;
 const nearBottom = () => clist.scrollTop + clist.clientHeight >= clist.scrollHeight - 60;
-function chatEl(m) {
-  const a = authorOf(m.user_id);
-  const li = el("li", { className: "cmsg" });
-  li.dataset.id = m.id;
-  li.append(el("a", { href: pageHref(a), title: a.name }, avatarEl(a, true)),
-    el("div", { className: "cb" }, el("a", { href: pageHref(a), textContent: a.name }), whenEl(Date.parse(m.created_at)), el("span", { className: "ct", textContent: m.text })));
-  if (isAdmin) li.append(el("button", { type: "button", className: "x", title: "Delete", textContent: "×", onclick: () =>
+function renderChatControls() {
+  const shown = onHub ? true : curTab === "wall", m = isMember();
+  $("#cform").hidden = !shown || !m;
+  $("#cguest").hidden = !shown || m;
+}
+$("#cgLogin").addEventListener("click", () => openAuth("login"));
+$("#cgSignup").addEventListener("click", () => openAuth("signup"));
+function chatEl(m, prev) {
+  const a = authorOf(m.user_id), ts = Date.parse(m.created_at);
+  const cont = !!prev && prev.user_id === m.user_id && ts - Date.parse(prev.created_at) < 5 * 60000;
+  const li = el("li", { className: "cmsg" + (cont ? " cont" : "") + (me && m.user_id === me.id ? " mine" : "") });
+  li.dataset.id = m.id; li.title = new Date(ts).toLocaleString();
+  li.append(el("a", { href: pageHref(a), className: "avl", title: a.name }, avatarEl(a, true)),
+    el("div", { className: "cb" }, el("span", { className: "cn" }, el("a", { href: pageHref(a), textContent: a.name }), whenEl(ts)),
+      el("span", { className: "ct", textContent: m.text })));
+  if (isAdmin) li.append(el("button", { type: "button", className: "x", title: "Delete this message", textContent: "×", onclick: () =>
     sb.from("chat_messages").delete().eq("id", m.id).select("id").then(must).catch(err => alert(explain(err))) }));
   return li;
 }
+function renderChat(keepBottom) {
+  const fromBottom = clist.scrollHeight - clist.scrollTop;
+  const items = chatMsgs.map((m, i) => chatEl(m, chatMsgs[i - 1]));
+  clist.replaceChildren(...(chatOlder ? [el("li", { className: "cmore", textContent: "scroll up for older messages" })] : []), ...items);
+  if (!chatMsgs.length) clist.append(el("li", { className: "csys", textContent: "Quiet in here. Say hi to everyone." }));
+  clist.scrollTop = keepBottom ? clist.scrollHeight : clist.scrollHeight - fromBottom;
+}
 async function loadChat() {
   if (!sb) return;
-  const { data, error } = await sb.from("chat_messages").select("id,user_id,text,created_at").order("id", { ascending: false }).limit(100);
+  const { data, error } = await sb.from("chat_messages").select("id,user_id,text,created_at").order("id", { ascending: false }).limit(60);
   if (error) return;
   await needAuthors(data.map(m => m.user_id));
-  clist.replaceChildren(...data.reverse().map(chatEl));
-  if (!data.length) clist.append(el("li", { className: "fempty", textContent: "Quiet in here. Say hi." }));
-  clist.scrollTop = clist.scrollHeight;
+  chatMsgs = data.reverse(); chatOlder = data.length === 60;
+  renderChat(true);
 }
+async function loadOlderChat() {
+  if (!chatOlder || chatLoading || !chatMsgs.length || clist.scrollTop > 40) return;
+  chatLoading = true;
+  const { data, error } = await sb.from("chat_messages").select("id,user_id,text,created_at").lt("id", chatMsgs[0].id).order("id", { ascending: false }).limit(60);
+  chatLoading = false;
+  if (error) return;
+  await needAuthors(data.map(m => m.user_id));
+  chatMsgs = data.reverse().concat(chatMsgs); chatOlder = data.length === 60;
+  renderChat(false);                                   // stays on the message you were reading
+}
+clist.addEventListener("scroll", loadOlderChat, { passive: true });
 async function addChat(m) {
+  if (chatMsgs.some(x => x.id === m.id)) return;
   await needAuthors([m.user_id]);
+  const stick = nearBottom() || (me && m.user_id === me.id);
+  clist.querySelector(".csys:not(.note)")?.remove();
+  clist.append(chatEl(m, chatMsgs[chatMsgs.length - 1]));
+  chatMsgs.push(m);
+  if (stick) clist.scrollTop = clist.scrollHeight;
+}
+function dropChat(id) {
+  chatMsgs = chatMsgs.filter(m => m.id !== id);
+  renderChat(nearBottom());
+}
+/* a note only this visitor sees (easter eggs, pokes): shown in the chat */
+function chatNote(nodes) {
   const stick = nearBottom();
-  clist.querySelector(".fempty")?.remove();
-  clist.append(chatEl(m));
-  while (clist.children.length > 200) clist.firstChild.remove();
-  if (stick || (me && m.user_id === me.id)) clist.scrollTop = clist.scrollHeight;
+  clist.append(el("li", { className: "csys note" }, ...nodes));
+  if (stick) clist.scrollTop = clist.scrollHeight;
 }
 $("#cform").addEventListener("submit", e => {
   e.preventDefault();
   if (needAccount()) return;
   const text = $("#ctext").value.trim();
   if (!text) return;
+  if (window.runEgg && runEgg(text)) { $("#ctext").value = ""; return; }
   $("#csend").disabled = true;
   sb.from("chat_messages").insert({ user_id: me.id, text: text.slice(0, 500) }).select("id").then(must)
-    .then(() => { $("#ctext").value = ""; }, err => alert("Not sent: " + guestError(err))).finally(() => $("#csend").disabled = false);
+    .then(() => { $("#ctext").value = ""; $("#ctext").focus(); }, err => chatNote(["Not sent: " + guestError(err)])).finally(() => $("#csend").disabled = false);
 });
+/* on a profile the chat lives in the wall box */
+if (!onHub) $(".a-wall .box").append(clist, $("#cform"), $("#cguest"));
 
 /* ---------- friends: mutual follows, plus who I follow and who follows me ---------- */
 async function loadFriends() {
@@ -2248,6 +2309,10 @@ async function loadFriends() {
     section("Followers", followers, "Nobody follows you yet."));
 }
 
+function chatChange(p) {
+  if (p.eventType === "INSERT") addChat(p.new);
+  if (p.eventType === "DELETE" && p.old) dropChat(p.old.id);
+}
 /* the realtime wiring of the hub */
 function startHub() {
   $("#profilePage").hidden = true; $("#hubPage").hidden = false;
@@ -2262,7 +2327,7 @@ if (onHub) startHub();
 async function hubFeedChange(p) {
   const table = p.table, row = p.new && Object.keys(p.new).length ? p.new : null, id = (row || p.old || {}).id;
   if (p.eventType === "DELETE") { removeFeedItem(id); return; }
-  const isFeed = table === "articles" || (row && row.in_feed);
+  const isFeed = table === "articles" || (row && row.from_feed);           // wall messages never go to the feed
   if (!isFeed) return;
   const r = table === "articles"
     ? { kind: "article", id: row.id, author_id: row.user_id || null, title: row.title, body: str(row.body, 400), created_at: row.created_at, edited: Date.parse(row.updated_at) - Date.parse(row.created_at) > 60000 }
@@ -2322,7 +2387,8 @@ async function connect() {
       await setMe(session); roles();
       if (isOwner && !was) { input.value = ""; guestFocus = false; say("You're in."); }
       renderProfile(); reloadFollow();
-      if (onHub && sb) { followedIds = null; if (view.kind === "feed") loadFeed(true); else if (view.kind === "friends") loadFriends(); loadChat(); }
+      if (onHub && sb) { followedIds = null; if (view.kind === "feed") loadFeed(true); else if (view.kind === "friends") loadFriends(); }
+      if (sb) loadChat();                                                 // "mine" and the delete buttons depend on who you are
     });
   });
 
@@ -2354,10 +2420,7 @@ async function connect() {
         const old = list.querySelector(`.citem[data-id="${c.id}"]`);
         old ? old.replaceWith(commentEl(c)) : list.append(commentEl(c));
       })
-      .on("postgres_changes", { event: "*", schema: "public", table: "chat_messages" }, p => {
-        if (p.eventType === "INSERT") addChat(p.new);
-        if (p.eventType === "DELETE" && p.old) clist.querySelector(`.cmsg[data-id="${p.old.id}"]`)?.remove();
-      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "chat_messages" }, chatChange)
       .on("postgres_changes", { event: "*", schema: "public", table: "follows" }, () => {
         followedIds = null;
         if (view.kind === "friends") loadFriends();
@@ -2415,10 +2478,11 @@ async function connect() {
     .on("postgres_changes", { event: "*", schema: "public", table: "articles" }, reloadArticles)
     .on("postgres_changes", { event: "UPDATE", schema: "public", table: "site_stats" }, reloadFollow)
     .on("postgres_changes", { event: "*", schema: "public", table: "follows" }, reloadFollow)
+    .on("postgres_changes", { event: "*", schema: "public", table: "chat_messages" }, chatChange)
     .subscribe(status => { if (status === "SUBSCRIBED") { /* nothing else to do */ } });
 
   if (onMain) sb.from("profile").select("*").eq("id", 1).maybeSingle().then(({ data }) => applyProfile(data));
-  reloadFollow();
+  reloadFollow(); loadChat();
   loadArticles();
   wallQuery(sb.from("posts").select(POST_COLS, { count: "exact" })).order("created_at", { ascending: false }).limit(PAGE)
     .then(({ data, count, error }) => {
@@ -2673,7 +2737,7 @@ connect().catch(e => console.warn("status448: database offline", e)).finally(() 
 
 (async function run() {
   await introGate;                                  // the wall comes alive when the intro says so
-  if (!onMain) return;                              // people's pages have no simulated chatter
+  if (!onMain || $("#feed").hidden) return;         // the wall became the chat room: no simulated chatter
   await Promise.race([firstPosts, sleep(1800)]);
   await sleep(250);
   if (realTotal < FADE_OUT_AT)
