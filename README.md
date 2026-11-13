@@ -4,10 +4,12 @@
 
 # status448
 
-**Социальная сеть с населением в одного человека. Пока что.**
+[Русский](README.ru.md) · **English**
 
-Личный сайт в духе соцсетей середины 2000-х: профиль, стена, лента, друзья и чат.
-Весь фронтенд умещается в один `index.html`, а данные хранятся в Supabase.
+**A social network with a population of one. For now.**
+
+A personal site styled after mid-2000s social networks: profile, wall, feed, friends and chat.
+The whole frontend fits in one `index.html`, and the data lives in Supabase.
 
 ![HTML](https://img.shields.io/badge/HTML-one_file-7a1c26?style=flat-square)
 ![Vanilla JS](https://img.shields.io/badge/JS-vanilla-7a1c26?style=flat-square)
@@ -19,104 +21,104 @@
 
 ---
 
-## ✦ Что это
+## ✦ What it is
 
-`status448` — это профиль **448 / тринадцатый** (FullStack Developer, Georgia), оформленный как страница в старой соцсети. Цвет — тёмно-малиновый, шрифты — Tahoma и Georgia, есть кнопка 88×31 и статус отношений «with my code».
+`status448` is the profile of **448 / тринадцатый** (FullStack Developer, Georgia), made to look like a page on an old social network. The color is deep crimson, the fonts are Tahoma and Georgia, and there's an 88×31 button and a relationship status of "with my code".
 
-Сначала сайт был одной страницей. Теперь это маленькая соцсеть: можно зарегистрироваться, завести свою страницу, подписываться на людей, писать на стенах, в ленте и в общем чате.
+It started as a single page. Now it's a small social network: you can sign up, get your own page, follow people, and write on walls, in the feed and in the shared chat.
 
-## ✦ Возможности
+## ✦ Features
 
 | | |
 |---|---|
-| 🎬 **Интро** | «press any key to compile»: IDE на экране набирает код этого самого сайта, после чего он появляется. Показывается один раз за визит. |
-| 👤 **Профили** | Страница владельца и страница у каждого пользователя. Владелец редактирует свою прямо на сайте: включает режим редактирования и правит текст на месте. |
-| 🖼 **Фото** | Выбор картинки, обрезка до квадрата, сжатие до 400×400 JPEG и загрузка в Supabase Storage. |
-| 🧱 **Стена** | Сообщения на стенах. Гости без аккаунта могут писать только на главную стену, с лимитами на сервере. |
-| 📰 **Лента** | Посты из блока «What's new?» и статьи, свежие сверху, с комментариями. |
-| 📝 **Статьи** | Длинные посты в Markdown. |
-| 🤝 **Друзья** | Подписки и подписчики. Если подписка взаимная, человек считается другом. |
-| 💬 **Чат** | Одна общая комната в реальном времени. |
-| 🟢 **Сейчас на странице** | Кто сейчас смотрит страницу (Supabase Presence). |
-| 🎵 **Плеер** | Часовой трек «448 radio: one hour, no skips». Не прерывается при переходах по сайту. |
-| 🥚 **Пасхалки** | Есть. Какие именно — секрет. |
+| 🎬 **Intro** | "press any key to compile": an on-screen IDE types out the code of this very site, then the site appears. Plays once per visit. |
+| 👤 **Profiles** | The owner's page plus a page for every user. The owner edits their page right on the site: switch on edit mode and change the text in place. |
+| 🖼 **Photo** | Pick an image, crop it to a square, shrink it to a 400×400 JPEG and upload it to Supabase Storage. |
+| 🧱 **Wall** | Messages on walls. Guests without an account can post only on the main wall, with limits enforced on the server. |
+| 📰 **Feed** | Posts from the "What's new?" box and articles, newest first, with comments. |
+| 📝 **Articles** | Long posts in Markdown. |
+| 🤝 **Friends** | Following and followers. When the follow goes both ways, that person is a friend. |
+| 💬 **Chat** | One shared real-time room. |
+| 🟢 **Now on page** | Who is viewing the page right now (Supabase Presence). |
+| 🎵 **Player** | An hour-long track, "448 radio: one hour, no skips". Keeps playing while you move around the site. |
+| 🥚 **Easter eggs** | There are some. Which ones is a secret. |
 
-## ✦ Как это устроено
+## ✦ How it works
 
 ```
-index.html  ──┬── оболочка (shell)  открытая напрямую страница держит <audio>
-              │                     и показывает сайт в полноэкранном iframe,
-              │                     поэтому музыка не прерывается при переходах
+index.html  ──┬── shell   opened directly, the page holds the <audio>
+              │           and shows the site in a full-window iframe,
+              │           so the music never stops between pages
               │
-              └── сайт              HTML + CSS + vanilla JS, без сборки и фреймворков
-                                    supabase-js подгружается с jsDelivr по требованию
+              └── site    HTML + CSS + vanilla JS, no build step, no frameworks
+                          supabase-js is loaded from jsDelivr on demand
                      │
                      ▼
-              Supabase ── Postgres   таблицы, RLS-политики, триггеры и функции
-                       ── Auth       вход по нику (технический e-mail <nick>@…)
-                       ── Storage    фотографии профилей
-                       ── Realtime   живые стены, лента и чат, Presence
+              Supabase ── Postgres   tables, RLS policies, triggers and functions
+                       ── Auth       nickname sign-in (technical e-mail <nick>@…)
+                       ── Storage    profile photos
+                       ── Realtime   live walls, feed and chat, Presence
 ```
 
-Все права проверяет сама база: политики RLS, триггеры и `security definer`-функции. Клиент только решает, какие кнопки показать. Ключ `sb_publishable_…` в коде публичный по замыслу Supabase.
+The database itself checks every permission: RLS policies, triggers and `security definer` functions. The client only decides which buttons to show. The `sb_publishable_…` key in the code is meant to be public, by Supabase's design.
 
-### Адреса страниц
+### Page addresses
 
-| URL | Страница |
+| URL | Page |
 |---|---|
-| `./` | Главная владельца. Если вы зарегистрировались, открывается ваша страница. |
-| `?u=448` | Профиль владельца |
-| `?u=nick` | Профиль пользователя |
-| `?feed` | Лента |
-| `?friends` | Друзья, подписки и подписчики |
-| `?chat` | Чат |
-| `?nointro` | Открыть без интро (удобно при разработке) |
-| `?noshell` | Открыть без оболочки с плеером |
+| `./` | The owner's main page. Once you've signed up, your own page opens instead. |
+| `?u=448` | The owner's profile |
+| `?u=nick` | A user's profile |
+| `?feed` | Feed |
+| `?friends` | Friends, following and followers |
+| `?chat` | Chat |
+| `?nointro` | Open without the intro (handy while developing) |
+| `?noshell` | Open without the player shell |
 
-### Кто что может
+### Who can do what
 
-| | Читать | Писать на стенах | Свой профиль | Удалять чужое |
+| | Read | Write on walls | Own profile | Delete others' content |
 |---|:-:|:-:|:-:|:-:|
-| Гость | ✅ | только главная стена | — | — |
-| Пользователь | ✅ | ✅ | ✅ | — |
-| Владелец | ✅ | ✅ | ✅ | ✅ |
+| Guest | ✅ | main wall only | — | — |
+| User | ✅ | ✅ | ✅ | — |
+| Owner | ✅ | ✅ | ✅ | ✅ |
 
-## ✦ Файлы
+## ✦ Files
 
 ```
 .
-├── index.html              весь сайт: разметка, стили, скрипты
-├── photo.jpg               фото по умолчанию
-├── button-88x31.png        кнопка-баннер 88×31
-├── music.mp3               трек для плеера
-├── .nojekyll               чтобы GitHub Pages отдавал файлы как есть
-├── supabase.sql            1. база: владелец, профиль, посты, статьи, хранилище фото
-├── supabase-guests.sql     2. гости: посты на стене, подписчики, лимиты
-├── supabase-users.sql      3. аккаунты, профили пользователей, подписки
-├── supabase-feed.sql       4. лента, комментарии, чат
-└── supabase-feed-fix.sql   5. в ленту попадают только посты, написанные в ленте
+├── index.html              the whole site: markup, styles, scripts
+├── photo.jpg               default photo
+├── button-88x31.png        88×31 banner button
+├── music.mp3               track for the player
+├── .nojekyll               makes GitHub Pages serve files as they are
+├── supabase.sql            1. database: owner, profile, posts, articles, photo storage
+├── supabase-guests.sql     2. guests: wall posts, followers, limits
+├── supabase-users.sql      3. accounts, user profiles, follows
+├── supabase-feed.sql       4. feed, comments, chat
+└── supabase-feed-fix.sql   5. only posts written in the feed go to the feed
 ```
 
-## ✦ Запуск своей копии
+## ✦ Running your own copy
 
-1. **Создайте проект** на [supabase.com](https://supabase.com).
-2. **Зарегистрируйте владельца**: Authentication → Users. Скопируйте его User UID.
-3. **Настройте базу.** В SQL Editor выполните скрипты строго по порядку:
+1. **Create a project** at [supabase.com](https://supabase.com).
+2. **Register the owner**: Authentication → Users. Copy their User UID.
+3. **Set up the database.** In the SQL Editor, run the scripts strictly in this order:
    `supabase.sql` → `supabase-guests.sql` → `supabase-users.sql` → `supabase-feed.sql` → `supabase-feed-fix.sql`.
-   Перед этим вставьте свой UID в первую строку `supabase.sql`. Все скрипты можно запускать повторно.
-4. **Подключите сайт.** В `index.html`, в разделе `1. SUPABASE`, замените `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `OWNER_ID` и `NICK_DOMAIN` на свои значения.
-5. **Опубликуйте.** Отправьте файлы в репозиторий и включите GitHub Pages (Settings → Pages → ветка `main`, папка `/`).
+   Before that, paste your UID into the first line of `supabase.sql`. Every script is safe to re-run.
+4. **Connect the site.** In `index.html`, section `1. SUPABASE`, replace `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `OWNER_ID` and `NICK_DOMAIN` with your own values.
+5. **Publish.** Push the files to a repository and turn on GitHub Pages (Settings → Pages → branch `main`, folder `/`).
 
-Локально подойдёт любой статический сервер:
+Any static server works locally:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Затем откройте <http://localhost:8000/?nointro>.
+Then open <http://localhost:8000/?nointro>.
 
 ---
 
 <div align="center">
-<sub>Сделано вручную, без фреймворков и сборки. Relationship status: with my code.</sub>
+<sub>Handmade, no frameworks, no build step. Relationship status: with my code.</sub>
 </div>
