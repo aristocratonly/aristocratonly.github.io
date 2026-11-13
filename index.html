@@ -244,6 +244,10 @@ b{font-weight:700}
 .post[data-kind=real] .row{box-shadow:inset 3px 0 var(--crimson)}
 .post[data-kind=real] .ico{background:var(--crimson);border-color:var(--crimson-deep);color:#fff}
 .post[data-kind=fake] p{color:#62575a}
+/* visitors' posts: a cool blue badge, so nobody mistakes them for the owner's */
+.post[data-kind=guest] .ico{background:#e9eef6;border-color:#c3cede;color:var(--link)}
+.post[data-kind=guest] .row{box-shadow:inset 3px 0 #9fb1cc}
+.followbtn.on{color:var(--muted)}
 .pb{flex:1;min-width:0}
 .pb p{overflow-wrap:anywhere;white-space:pre-wrap}
 .pb p b{color:var(--link)}
@@ -507,7 +511,7 @@ else document.documentElement.classList.add("ip");
 
     <section class="a-photo" aria-label="Picture">
       <div class="box b-pic">
-        <h2>Picture</h2>
+        <h2>Picture <span id="followers"></span></h2>
         <div class="pad">
           <div class="photo" id="photo">
             <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="38" r="21"/><path d="M8 100c2-25 20-36 42-36s40 11 42 36z"/></svg>
@@ -598,6 +602,19 @@ else document.documentElement.classList.add("ip");
     <div class="btns">
       <button type="submit" class="btn" id="edSave">Publish</button>
       <button type="button" class="btn plain" id="edPrevBtn">Preview</button>
+      <button type="button" class="btn plain" data-close>Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="dlg" id="dlgName">
+  <h2>Your name on the wall</h2>
+  <form id="nameForm">
+    <label>Name <input type="text" id="gname" maxlength="24" autocomplete="nickname" required></label>
+    <p class="hint">Saved in this browser, so next time you can just write.</p>
+    <p class="err" id="nerr" role="alert"></p>
+    <div class="btns">
+      <button type="submit" class="btn" id="nsave">Save</button>
       <button type="button" class="btn plain" data-close>Cancel</button>
     </div>
   </form>
@@ -863,6 +880,9 @@ function renderProfile() {
   /* actions under the photo */
   const act = $("#actions"); act.replaceChildren();
   act.append(el("li", {}, el("button", { type: "button", textContent: "Poke " + name, onclick: poke })));
+  if (!isOwner) act.append(el("li", {}, el("button", { type: "button", className: "followbtn" + (following ? " on" : ""),
+    textContent: following ? `Following ${name} ✓` : `Follow ${name}`, title: following ? "Click to unfollow" : "", onclick: toggleFollow })));
+  showFollowers();
 
   /* photo */
   const ph = $("#photo");
@@ -1166,15 +1186,35 @@ function editPost(li) {
   ta.addEventListener("keydown", e => { if (e.key === "Escape") done(); if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); } });
   p.replaceWith(form); ta.focus();
 }
+/* a visitor's post: their name, their text; delete for the owner and for the author */
+function fillGuest(p, ctl, li) {
+  const d = li._data;
+  if (!d) return;
+  p.replaceChildren(el("b", { textContent: d.author }), " wrote on ", el("b", { textContent: profile.name }), "'s wall:\n", d.text);
+  li.dataset.sfx = d.mine ? ", that's you" : d.edited ? ", edited" : "";
+  ctl.replaceChildren();
+  if (isOwner || d.mine) ctl.append(el("button", { type: "button", textContent: "delete", onclick: () => {
+    if (!confirm("Delete this post for everyone?")) return;
+    const job = isOwner
+      ? sb.from("posts").delete().eq("id", li.dataset.id).select("id").then(must)
+      : sb.rpc("guest_delete", { token: guest.token, post_id: li.dataset.id }).then(r => { if (r.error) throw r.error; if (!r.data) throw { code: "denied" }; });
+    job.then(() => { removePost(li.dataset.id); if (isOwner) say("Post deleted."); },
+             e => isOwner ? say(explain(e), true) : addLocal({ icon: "!", t: "Couldn't delete: " + guestError(e) }));
+  } }));
+  stamp(li);
+}
 /* one row from the posts table -> on the wall (new or updated) */
 function upsertPost(row, quiet) {
-  const id = row.id;
+  const id = row.id, isGuest = !!row.author;
   let li = realById.get(id);
-  const data = { text: str(row.text, LIMITS.post), edited: !!row.edited_at };
+  const data = { text: str(row.text, LIMITS.post), edited: !!row.edited_at,
+    author: str(row.author, 24), mine: isGuest && !!guest.key && row.author_key === guest.key };
   const ts = Date.parse(row.created_at) || Date.now();
   if (li) { li._data = data; li.dataset.ts = ts; li._fill(); }
   else {
-    li = addPost({ kind: "real", me: true, id, ts, quiet, fill: fillReal });
+    li = isGuest
+      ? addPost({ kind: "guest", icon: ([...data.author][0] || "?").toUpperCase(), id, ts, quiet, fill: fillGuest })
+      : addPost({ kind: "real", me: true, id, ts, quiet, fill: fillReal });
     realById.set(id, li);
     li._data = data; li._fill();
   }
@@ -1192,7 +1232,11 @@ const input = $("#status"), who = $("#who"), send = $("#send");
 let guestFocus = false;
 function setComposer() {
   if (isOwner) { who.textContent = profile.name; input.placeholder = "What's on your mind?"; input.maxLength = LIMITS.post; }
-  else { who.textContent = guestFocus ? "You:" : profile.name + " is"; input.placeholder = `write on ${profile.name}'s wall`; input.maxLength = 90; }
+  else {
+    who.textContent = guestFocus ? (guest.name ? guest.name + ":" : "You:") : profile.name + " is";
+    who.title = guestFocus ? (guest.name ? "Click to change your name" : "Click to set your name") : "";
+    input.placeholder = `write on ${profile.name}'s wall`; input.maxLength = 280;
+  }
 }
 function cycler(list) {
   let bag = [];
@@ -1232,10 +1276,79 @@ $("#composer").addEventListener("submit", e => {
     return;
   }
   if (!guestFocus) return;
-  addPost({ kind: "local", icon: "✎", sfx: ", only you can see this", fill: p => p.replaceChildren(el("b", { textContent: "You" }), ` wrote on ${profile.name}'s wall: "${text}"`) });
-  input.value = "";
-  setTimeout(() => addLocal({ me: true, t: nextReply() }), 1900);
+  if (!sb) {                                     // no database: the old "only you can see this" note
+    addPost({ kind: "local", icon: "✎", sfx: ", only you can see this", fill: p => p.replaceChildren(el("b", { textContent: "You" }), ` wrote on ${profile.name}'s wall: "${text}"`) });
+    input.value = "";
+    return;
+  }
+  if (!guest.name) { askName(() => $("#composer").requestSubmit()); return; }
+  send.disabled = true;
+  sb.rpc("guest_post", { token: guest.token, name: guest.name, body: text.slice(0, 280) }).then(({ error }) => {
+    send.disabled = false;
+    if (error) { addLocal({ icon: "!", t: "Not posted: " + guestError(error) }); return; }
+    input.value = "";
+    setTimeout(() => addLocal({ me: true, t: nextReply() }), 1900);
+  }, () => { send.disabled = false; addLocal({ icon: "!", t: "Not posted: no connection." }); });
 });
+
+/* ---------- visitors: a name and a key kept in this browser ---------- */
+const GUEST_KEY = "s448-guest";
+const guest = { token: "", name: "", key: "" };     // key = SHA-256 of the token, matches posts.author_key
+try { const g = JSON.parse(localStorage.getItem(GUEST_KEY) || "null"); if (g) { guest.token = str(g.token, 64); guest.name = str(g.name, 24); } } catch {}
+if (!/^[A-Za-z0-9_-]{32,64}$/.test(guest.token))
+  guest.token = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const saveGuest = () => { try { localStorage.setItem(GUEST_KEY, JSON.stringify({ token: guest.token, name: guest.name })); } catch {} };
+saveGuest();
+if (crypto.subtle) crypto.subtle.digest("SHA-256", new TextEncoder().encode(guest.token)).then(buf => {
+  guest.key = [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+  refreshPosts();                                 // now "delete" shows on this visitor's own posts
+});
+/* server messages are plain sentences; keep them as text */
+const guestError = e => str((e && e.message) || "something went wrong", 140).replace(/[*{}]/g, "");
+
+let afterName = null;
+function askName(then) {
+  afterName = then || null;
+  $("#gname").value = guest.name; $("#nerr").textContent = "";
+  $("#dlgName").showModal(); $("#gname").focus(); $("#gname").select();
+}
+$("#nameForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const n = $("#gname").value.replace(/\s+/g, " ").trim();
+  if (!n || n.length > 24) { $("#nerr").textContent = "1 to 24 characters, please."; return; }
+  if (n.toLowerCase() === profile.name.toLowerCase() || ["448", "admin", "owner", "status448"].includes(n.toLowerCase())) {
+    $("#nerr").textContent = "That name belongs to the owner. Pick another one."; return;
+  }
+  guest.name = n; saveGuest();
+  $("#dlgName").close(); setComposer();
+  const go = afterName; afterName = null;
+  if (go) go(); else input.focus();
+});
+$("#dlgName").addEventListener("close", () => { afterName = null; });
+who.addEventListener("click", e => { if (isOwner || !guestFocus) return; e.preventDefault(); askName(null); });
+who.addEventListener("mousedown", e => { if (!isOwner && guestFocus) e.preventDefault(); });   // keep the input focused
+
+/* ---------- followers ---------- */
+let following = false, followerCount = null;
+try { following = localStorage.getItem("s448-following") === "1"; } catch {}
+function showFollowers() {
+  $("#followers").textContent = followerCount == null ? "" : `${followerCount} follower${followerCount === 1 ? "" : "s"}`;
+}
+function setFollowing(on) {
+  following = on;
+  try { on ? localStorage.setItem("s448-following", "1") : localStorage.removeItem("s448-following"); } catch {}
+  renderProfile();
+}
+function toggleFollow() {
+  if (!sb) { addLocal({ icon: "+", t: "Following works once the database is connected." }); return; }
+  const on = !following;
+  sb.rpc(on ? "follow" : "unfollow", { token: guest.token }).then(({ data, error }) => {
+    if (error) { addLocal({ icon: "!", t: guestError(error) }); return; }
+    if (typeof data === "number") followerCount = data;
+    setFollowing(on);
+    addLocal(on ? { icon: "★", t: "You followed {n}. Bold move for 2004." } : { icon: "×", t: "You unfollowed {n}. {n} will survive. Probably." });
+  }, () => addLocal({ icon: "!", t: "No connection. Try again." }));
+}
 
 /* ---------- the 88x31 button: hidden, type "88x31" to find it ---------- */
 function copyBadge() {
@@ -1546,11 +1659,20 @@ async function connect() {
       trim();
     })
     .on("postgres_changes", { event: "*", schema: "public", table: "articles" }, reloadArticles)
+    .on("postgres_changes", { event: "UPDATE", schema: "public", table: "site_stats" }, p => {
+      if (p.new && typeof p.new.followers === "number") { followerCount = p.new.followers; showFollowers(); }
+    })
     .subscribe(status => { if (status === "SUBSCRIBED") { /* nothing else to do */ } });
 
   sb.from("profile").select("*").eq("id", 1).maybeSingle().then(({ data }) => applyProfile(data));
+  sb.from("site_stats").select("followers").eq("id", 1).maybeSingle().then(({ data }) => {
+    if (data && typeof data.followers === "number") { followerCount = data.followers; showFollowers(); }
+  });
+  sb.rpc("is_following", { token: guest.token }).then(({ data, error }) => {   // the server knows best
+    if (!error && typeof data === "boolean" && data !== following) setFollowing(data);
+  });
   loadArticles();
-  sb.from("posts").select("id,text,created_at,edited_at", { count: "exact" }).order("created_at", { ascending: false }).limit(20)
+  sb.from("posts").select("id,text,created_at,edited_at,author,author_key", { count: "exact" }).order("created_at", { ascending: false }).limit(20)
     .then(({ data, count, error }) => {
       if (!error) { realTotal = count || 0; data.slice().reverse().forEach(r => upsertPost(r, true)); trim(); }
       postsReady();
