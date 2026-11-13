@@ -854,9 +854,13 @@ const NICK_DOMAIN = "users.aristocratonly.github.io";
 const NICK_RE = /^[a-z0-9_]{3,20}$/;
 const RESERVED = ["448", "admin", "owner", "status448", "root", "support", "moderator", "system", "null"];
 /* ?u=nick opens that person's page; without it, the owner's main page */
-/* Pages:  ./ the feed  |  ?friends  |  ?chat  |  ?u=448 the owner's profile  |  ?u=nick someone's profile */
+/* Pages:  ./ the owner's page for visitors, your own page once you've signed up / logged in here
+   ?feed the feed  |  ?friends  |  ?chat  |  ?u=448 the owner's profile  |  ?u=nick someone's profile */
+const HOME_KEY = "s448home";    // where "./" sends this browser: "?u=nick" once you have an account
+if (!location.search) try { const h = localStorage.getItem(HOME_KEY); if (h && h !== "?u=448") location.replace(h + location.hash); } catch {}
 const view = (() => {
   const q = new URLSearchParams(location.search), n = (q.get("u") || "").toLowerCase();
+  if (!location.search) return { kind: "main", nick: "", id: null, missing: false };
   const v = kind => ({ kind, nick: kind === "user" ? n : "", id: null, missing: false });
   return n === "448" ? v("main") : NICK_RE.test(n) ? v("user") : q.has("friends") ? v("friends") : q.has("chat") ? v("chat") : v("feed");
 })();
@@ -1886,6 +1890,7 @@ $("#loginForm").addEventListener("submit", async e => {
         /database/i.test(error.message) ? "That nickname can't be used. Try another one." : error.message);
       if (!data.session) return err("Account created, but it must be confirmed first. Ask the site owner.");
       $("#dlgLogin").close();
+      try { localStorage.setItem(HOME_KEY, "?u=" + encodeURIComponent(nick)); } catch {}
       location.href = "?u=" + encodeURIComponent(nick);                      // straight to your new page
     } finally { $("#lgo").disabled = false; }
     return;
@@ -1998,7 +2003,7 @@ function renderNav() {
   $(".navlist").replaceChildren(
     item("☺", me ? "My account" : "Log in", mine, onMine, mine ? null : () => openAuth("login")),
     item("♥", "My friends", "?friends", view.kind === "friends"),
-    item("≡", "Feed", "./", view.kind === "feed"),
+    item("≡", "Feed", "?feed", view.kind === "feed"),
     item("✉", "Chat", "?chat", view.kind === "chat"));
 }
 $("#topnav").append($("#player"));          // the music player sits in the menu bar on every page
@@ -2363,7 +2368,7 @@ async function connect() {
 
   /* who is signed in: the owner, a person with a profile, or nobody */
   const setMe = async session => {
-    if (!session) { me = null; return; }
+    if (!session) { me = null; try { localStorage.removeItem(HOME_KEY); } catch {} return; }
     const id = session.user.id;
     if (id === OWNER_ID) {
       const { data } = await sb.from("profile").select("name").eq("id", 1).maybeSingle();
@@ -2372,6 +2377,7 @@ async function connect() {
       const { data } = await sb.from("users_profile").select("nick,name").eq("id", id).maybeSingle();
       me = { id, admin: false, nick: data ? data.nick : "", name: data ? data.name : "" };
     }
+    try { if (me.nick) localStorage.setItem(HOME_KEY, "?u=" + encodeURIComponent(me.nick)); } catch {}
   };
   const roles = () => {
     isAdmin = !!(me && me.admin);
