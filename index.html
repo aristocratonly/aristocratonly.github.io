@@ -609,9 +609,15 @@ html.ip.show .site{opacity:1;transform:none;transition:opacity .9s ease,transfor
   <button type="button" class="i-skip" id="iskip">skip</button>
 </div>
 <script>
-/* ?nointro: straight to the site (handy while editing the profile). */
-if (/[?&](nointro(=|&|$)|u=|friends|chat)/.test(location.search)) document.getElementById("intro").remove();   // the intro opens the feed only
-else document.documentElement.classList.add("ip");
+/* The intro plays once per visit: on the first page of a visit, if that page is the feed.
+   The mark lives in sessionStorage, which the browser clears when the tab is closed,
+   so a new visit gets the intro again. ?nointro skips it (handy while editing). */
+(function () {
+  let seen = false;
+  try { seen = sessionStorage.getItem("s448-intro") === "1"; sessionStorage.setItem("s448-intro", "1"); } catch {}
+  if (seen || /[?&](nointro(=|&|$)|u=|friends|chat)/.test(location.search)) document.getElementById("intro").remove();
+  else document.documentElement.classList.add("ip");
+})();
 </script>
 
 <div class="site" id="site">
